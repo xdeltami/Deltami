@@ -254,7 +254,7 @@ Stub.giveCharacter(P2, 6, 6, 44)
 Players.PlayerAdded:Fire(P2)
 Stub.Scheduler.advance(2)
 local ls2 = P2:FindFirstChild("leaderstats")
-check("DataStore gagal: saldo darurat default 10.000", ls2 ~= nil and ls2:FindFirstChild("Micda") ~= nil and ls2:FindFirstChild("Micda").Value == 10000, ls2 and tostring(ls2:FindFirstChild("Micda").Value) or "hilang")
+check("DataStore gagal: saldo darurat default 999,99 T", ls2 ~= nil and ls2:FindFirstChild("Micda") ~= nil and ls2:FindFirstChild("Micda").Value == 999999999999000, ls2 and tostring(ls2:FindFirstChild("Micda").Value) or "hilang")
 Stub.Scheduler.advance(30)
 local ls2b = P2:FindFirstChild("leaderstats")
 check("Sinkron otomatis: data asli 5.000 diadopsi tanpa banner lama", ls2b ~= nil and ls2b:FindFirstChild("Micda") ~= nil and ls2b:FindFirstChild("Micda").Value == 5000, ls2b and tostring(ls2b:FindFirstChild("Micda").Value) or "hilang")
@@ -268,7 +268,7 @@ Stub.giveCharacter(P3, 12, 6, 44)
 Players.PlayerAdded:Fire(P3)
 Stub.Scheduler.advance(2)
 local ls3 = P3:FindFirstChild("leaderstats")
-check("P3 darurat: saldo default 10.000 tampil sementara", ls3 ~= nil and ls3:FindFirstChild("Micda") ~= nil and ls3:FindFirstChild("Micda").Value == 10000, ls3 and tostring(ls3:FindFirstChild("Micda").Value) or "hilang")
+check("P3 darurat: saldo default 999,99 T tampil sementara", ls3 ~= nil and ls3:FindFirstChild("Micda") ~= nil and ls3:FindFirstChild("Micda").Value == 999999999999000, ls3 and tostring(ls3:FindFirstChild("Micda").Value) or "hilang")
 local okDev, msgDev = serverCall("RedeemDevCode", P3, MOD_DevCodeVault.CODE)
 check("P3 bertransaksi di sesi darurat (tandai simpan = kondisi pemakai nyata)", okDev == true, tostring(msgDev))
 Stub.Scheduler.advance(30)
@@ -314,6 +314,111 @@ duniaStore.__failGet = 0
 Players.PlayerRemoving:Fire(P5)
 Stub.Scheduler.advance(0.5)
 check("Bersih-bersih ujian: lahan 1 kembali kosong setelah P5 keluar", MOD_PlotService.filledCount(1) == 0, tostring(MOD_PlotService.filledCount(1)))
+
+section("TRADE antar pemain: ajakan, tawaran, konfirmasi, eksekusi atomik")
+profStore.__data["u_2001"] = { m = 50000, t = { { kind = "benih", id = "wortel", count = 20 }, { kind = "hasil", id = "pisang", count = 30 } }, dev = false }
+profStore.__data["u_2002"] = { m = 20000, t = { { kind = "benih", id = "pisang", count = 8 }, { kind = "hasil", id = "tebu", count = 15 } }, dev = false }
+local TA = Stub.addPlayer(2001, "trader1")
+local TB = Stub.addPlayer(2002, "trader2")
+Stub.giveCharacter(TA, 30, 6, 44)
+Stub.giveCharacter(TB, 30.5, 6, 44)
+Players.PlayerAdded:Fire(TA)
+Players.PlayerAdded:Fire(TB)
+Stub.Scheduler.advance(1)
+
+local okAjak, msgAjak = serverCall("TradeAct", TA, "ajukan", 2002)
+check("Ajak trade dekat: sesi dibuat server", okAjak == true, tostring(msgAjak))
+local okDobel = serverCall("TradeAct", TB, "ajukan", 2001)
+check("Lawan yang sudah dalam trade tidak bisa diajak dobel", okDobel == false, "-")
+local okSendiri = serverCall("TradeAct", TA, "ajukan", 2001)
+check("Trade dengan diri sendiri DITOLAK", okSendiri == false, "-")
+
+local okBeliTerkunci = serverCall("ShopAct", TA, "buy", "common")
+check("Ekonomi terkunci saat trade: beli DITOLAK", okBeliTerkunci == false, "-")
+
+local okUbahKotor = serverCall("TradeAct", TA, "ubah", { items = { { kind = "benih", id = "wortel", count = 999 } }, micda = 0 })
+check("Tawaran melebihi stok DITOLAK server", okUbahKotor == false, "-")
+local okUbah1, msgUbah1 = serverCall("TradeAct", TA, "ubah", { items = { { kind = "benih", id = "wortel", count = 5 }, { kind = "hasil", id = "pisang", count = 10 } }, micda = 3000 })
+check("Tawaran trader1 sah: 5 benih wortel + 10 pisang + 3.000 Micda", okUbah1 == true, tostring(msgUbah1))
+local okUbah2, msgUbah2 = serverCall("TradeAct", TB, "ubah", { items = { { kind = "benih", id = "pisang", count = 4 } }, micda = 1000 })
+check("Tawaran trader2 sah: 4 benih pisang + 1.000 Micda", okUbah2 == true, tostring(msgUbah2))
+
+local okSetujuA, msgSetujuA = serverCall("TradeAct", TA, "setuju")
+check("Trader1 menandai siap", okSetujuA == true, tostring(msgSetujuA))
+local faseCek = (function()
+        local r = serverCall("TradeAct", TB, "ubah", { items = { { kind = "benih", id = "pisang", count = 2 } }, micda = 1000 })
+        return r
+end)()
+check("Masih tahap tawar: trader2 masih bisa mengubah tawaran (membatalkan 'siap')", faseCek == true, "-")
+local okSetujuA2 = serverCall("TradeAct", TA, "setuju")
+check("Trader1 menandai siap lagi setelah tawaran lawan berubah", okSetujuA2 == true, "-")
+local okSetujuB, msgSetujuB = serverCall("TradeAct", TB, "setuju")
+check("Trader2 siap -> masuk tahap konfirmasi (tawaran dikunci)", okSetujuB == true, tostring(msgSetujuB))
+local okUbahKunci = serverCall("TradeAct", TA, "ubah", { items = {}, micda = 0 })
+check("Tahap konfirmasi: tawaran TIDAK bisa diubah lagi", okUbahKunci == false, "-")
+
+local saldoASebelum = (serverCall("GetState", TA) or {}).micda
+local saldoBSebelum = (serverCall("GetState", TB) or {}).micda
+local okKonfirmA = serverCall("TradeAct", TA, "konfirm")
+check("Trader1 konfirmasi final", okKonfirmA == true, "-")
+local okKonfirmB, msgKonfirmB = serverCall("TradeAct", TB, "konfirm")
+check("Trader2 konfirmasi final -> trade dieksekusi", okKonfirmB == true, tostring(msgKonfirmB))
+
+local stA = serverCall("GetState", TA)
+local stB = serverCall("GetState", TB)
+local function hitung(st: any, kind: string, id: string): number
+        local n = 0
+        for _, s in ipairs(st.tas) do
+                if s.kind == kind and s.id == id then
+                        n += s.count
+                end
+        end
+        return n
+end
+check("Trader1 terima 2 benih pisang (tawaran akhir trader2)", stA and hitung(stA, "benih", "pisang") == 2, stA and tostring(hitung(stA, "benih", "pisang")) or "hilang")
+check("Trader1 TIDAK menerima tebu (tidak pernah ditawarkan)", stA and hitung(stA, "hasil", "tebu") == 0, "-")
+check("Trader1 saldo: -3.000 + 1.000", stA and stA.micda == saldoASebelum - 2000, tostring(stA and stA.micda) .. "/" .. tostring(saldoASebelum - 2000))
+check("Trader1 kehilangan 5 benih wortel & 10 pisang", stA and hitung(stA, "benih", "wortel") == 15 and hitung(stA, "hasil", "pisang") == 20, "-")
+check("Trader2 terima 5 benih wortel & 10 hasil pisang", stB and hitung(stB, "benih", "wortel") == 5 and hitung(stB, "hasil", "pisang") == 10, "-")
+check("Trader2 saldo: -1.000 + 3.000", stB and stB.micda == saldoBSebelum + 2000, tostring(stB and stB.micda))
+local okBukaLagi, msgBukaLagi = serverCall("TanamAct", TA, "status")
+check("Setelah trade: ekonomi terbuka lagi (papan tanam merespons)", okBukaLagi == true, tostring(msgBukaLagi))
+Stub.Scheduler.advance(3)
+if MOD_RateLimit and MOD_RateLimit.clear then
+        MOD_RateLimit.clear(2001)
+        MOD_RateLimit.clear(2003)
+end
+
+section("TRADE anti-exploit: jarak jauh, stok berubah, batal aman")
+profStore.__data["u_2003"] = { m = 1000, t = { { kind = "benih", id = "bayam", count = 3 } }, dev = false }
+local TC = Stub.addPlayer(2003, "trader3")
+Stub.giveCharacter(TC, 500, 6, 44)
+Players.PlayerAdded:Fire(TC)
+Stub.Scheduler.advance(1)
+local okJauh = serverCall("TradeAct", TA, "ajukan", 2003)
+check("Ajak pemain yang jauh DITOLAK (jarak server dihitung)", okJauh == false, "-")
+local okBatal = serverCall("TradeAct", TB, "batal")
+check("Batal tanpa sesi memberi tahu dengan bersih", okBatal == false, "-")
+
+Stub.giveCharacter(TC, 31, 6, 44)
+local okAjak2, msgAjak2 = serverCall("TradeAct", TA, "ajukan", 2003)
+check("Setelah TC dipindah dekat, sesi jalan", okAjak2 == true, tostring(msgAjak2))
+serverCall("TradeAct", TA, "ubah", { items = { { kind = "benih", id = "wortel", count = 2 } }, micda = 0 })
+serverCall("TradeAct", TC, "ubah", { items = { { kind = "benih", id = "bayam", count = 3 } }, micda = 500 })
+serverCall("TradeAct", TA, "setuju")
+serverCall("TradeAct", TC, "setuju")
+local okBatal2, msgBatal2 = serverCall("TradeAct", TA, "batal")
+check("Batal di tahap konfirmasi: sesi bubar", okBatal2 == true, tostring(msgBatal2))
+local stC = serverCall("GetState", TC)
+check("Rollback batal: barang TC tetap 3 bayam", stC and hitung(stC, "benih", "bayam") == 3, stC and tostring(hitung(stC, "benih", "bayam")) or "hilang")
+check("Rollback batal: Micda TC tetap 1.000", stC and stC.micda == 1000, tostring(stC and stC.micda))
+local stA2 = serverCall("GetState", TA)
+check("Rollback batal: barang TA tidak berkurang", stA2 and hitung(stA2, "benih", "wortel") == 15, tostring(stA2 and hitung(stA2, "benih", "wortel")))
+local okUbahLagi = serverCall("TradeAct", TA, "ubah", { items = {}, micda = 0 })
+check("Setelah batal: tidak ada sesi (ubah ditolak dengan pesan bersih)", okUbahLagi == false, "-")
+
+Players.PlayerRemoving:Fire(TC)
+Stub.Scheduler.advance(0.5)
 
 section("Booting UI klien")
 local pg = Instance.new("Folder")
@@ -843,6 +948,90 @@ local r3 = rootOf(P1)
 check("BALIK ke dunia lahan sukses", r3 and r3.Position.X > 5000, r3 and tostring(r3.Position) or "-")
 local labelBalik = findGui(dunia, "TextLabel", "TERTANAM 17/500")
 check("Papan tetap menunjukkan progres terakhir (17/500)", labelBalik ~= nil, labelBalik and labelBalik.Text or "-")
+
+section("UI trade: alur nyata server -> jendela trade di klien")
+if MOD_RateLimit and MOD_RateLimit.clear then
+        MOD_RateLimit.clear(1001)
+        MOD_RateLimit.clear(3001)
+end
+profStore.__data["u_3001"] = { m = 9000, t = { { kind = "hasil", id = "labu_maxima", count = 4 } }, dev = false }
+local TD = Stub.addPlayer(3001, "trader4")
+Stub.giveCharacter(TD, 0, 6, 44)
+Players.PlayerAdded:Fire(TD)
+Stub.Scheduler.advance(0.5)
+do
+        local rP1 = P1.Character and (P1.Character.PrimaryPart or P1.Character:FindFirstChild("HumanoidRootPart"))
+        if rP1 then
+                Stub.giveCharacter(TD, rP1.Position.X + 2, rP1.Position.Y, rP1.Position.Z)
+        end
+end
+local okAjakKlien, msgAjakKlien = serverCall("TradeAct", P1, "ajukan", 3001)
+check("Ajakan trade P1 -> trader4 lolos server (jarak dekat)", okAjakKlien == true, tostring(msgAjakKlien))
+Stub.Scheduler.advance(0.1)
+local dimTrade = gui:FindFirstChild("DimLayar")
+check("Jendela trade terbuka otomatis di klien P1 (TradeSync nyata)", dimTrade ~= nil and dimTrade.Visible == true, dimTrade and tostring(dimTrade.Visible) or "hilang")
+local teksLawan = false
+local teksJudul = false
+local tombolSiapAda = false
+local tombolBatalAda = false
+if dimTrade then
+        for _, d in ipairs(dimTrade:GetDescendants()) do
+                if (d:IsA("TextLabel") or d:IsA("TextButton")) and type(d.Text) == "string" then
+                        if string.find(d.Text, "Trade dengan trader4", 1, true) then
+                                teksLawan = true
+                        end
+                        if d.Text == "Trade" then
+                                teksJudul = true
+                        end
+                        if d.Text == "Tawaran Siap" then
+                                tombolSiapAda = true
+                        end
+                        if d.Text == "Batal Trade" then
+                                tombolBatalAda = true
+                        end
+                end
+        end
+end
+check("Judul panel menjadi 'Trade'", teksJudul, "-")
+check("Jendela memuat nama lawan (trader4)", teksLawan, "-")
+check("Tombol 'Tawaran Siap' tersedia", tombolSiapAda, "-")
+check("Tombol 'Batal Trade' tersedia", tombolBatalAda, "-")
+local lanjutBtn = gui:FindFirstChild("LanjutTrade", true)
+check("Tombol Lanjutkan Trade muncul di HUD", lanjutBtn ~= nil and lanjutBtn.Visible == true, lanjutBtn and tostring(lanjutBtn.Visible) or "hilang")
+local okTawarKlien, msgTawarKlien = serverCall("TradeAct", TD, "ubah", { items = { { kind = "hasil", id = "labu_maxima", count = 2 } }, micda = 0 })
+check("Tawaran trader4 (2 labu) diterima server", okTawarKlien == true, tostring(msgTawarKlien))
+Stub.Scheduler.advance(0.1)
+local teksTawaran = false
+if dimTrade then
+        for _, d in ipairs(dimTrade:GetDescendants()) do
+                if (d:IsA("TextLabel") or d:IsA("TextButton")) and type(d.Text) == "string" then
+                        if string.find(d.Text, "x2", 1, true) then
+                                teksTawaran = true
+                        end
+                end
+        end
+end
+check("Tawaran lawan tampil langsung di jendela (x2)", teksTawaran, "-")
+local okBatalKlien, msgBatalKlien = serverCall("TradeAct", P1, "batal")
+check("Batal dari klien diterima server", okBatalKlien == true, tostring(msgBatalKlien))
+Stub.Scheduler.advance(0.1)
+local dimSetelah = gui:FindFirstChild("DimLayar")
+check("Jendela trade menutup sendiri saat penutup batal", dimSetelah ~= nil and dimSetelah.Visible == false, dimSetelah and tostring(dimSetelah.Visible) or "hilang")
+local lanjutSetelah = gui:FindFirstChild("LanjutTrade", true)
+check("Tombol Lanjutkan Trade hilang setelah sesi tuntas", lanjutSetelah == nil or lanjutSetelah.Visible == false, "-")
+local stTD = serverCall("GetState", TD)
+check("Setelah batal: 4 labu trader4 utuh (tidak ada item pindah)", stTD ~= nil and (function()
+        local n = 0
+        for _, s in ipairs(stTD.tas) do
+                if s.kind == "hasil" and s.id == "labu_maxima" then
+                        n += s.count
+                end
+        end
+        return n
+end)() == 4, stTD and tostring(stTD.micda) or "hilang")
+Players.PlayerRemoving:Fire(TD)
+Stub.Scheduler.advance(0.3)
+
 
 section("Simpan data saat keluar")
 Players.PlayerRemoving:Fire(P1)

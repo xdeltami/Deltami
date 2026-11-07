@@ -818,6 +818,15 @@ function Stub.install()
                 return nil
         end
 
+        function Players:GetPlayerByUserId(id)
+                for _, p in ipairs(playerList) do
+                        if p.UserId == id then
+                                return p
+                        end
+                end
+                return nil
+        end
+
         local Workspace = Instance.new("Workspace")
         local camera = Instance.new("Camera")
         camera.Name = "Camera"

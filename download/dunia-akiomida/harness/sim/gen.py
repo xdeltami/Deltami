@@ -50,6 +50,7 @@ MODULES_SERVER = [
     "TanamService",
     "GudangService",
     "DropService",
+    "TradeService",
 ]
 
 
@@ -79,7 +80,7 @@ def shared_modules() -> list:
     for n in sorted(deps):
         visit(n, frozenset())
     return order
-LAZY_UI = "UIController"
+LAZY_UI = ["TradeUI", "UIController"]  # urutan = urutan definisi (TradeUI dipakai UIController)
 
 BANNED_NAMES = [
     "toram", "growtopia", "minecraft", "roblox studio", "adopt me",
@@ -129,8 +130,8 @@ def map_require(match: re.Match) -> str:
             name = m.group(1)
     if name is None:
         raise SystemExit("require tidak dikenali: " + arg)
-    if name == LAZY_UI:
-        return "LOAD_UI()"
+    if name in LAZY_UI:
+        return "LOAD_" + name + "()"
     return "MOD_" + name
 
 
@@ -173,7 +174,8 @@ def main() -> None:
     parts.append(wrap_module("Remotes", read(SRC / "Remotes" / "init.luau")))
     for name in MODULES_SERVER:
         parts.append(wrap_module(name, read(SRC / "Server" / "Modules" / f"{name}.luau")))
-    parts.append(wrap_module(LAZY_UI, read(SRC / "Client" / f"{LAZY_UI}.luau"), lazy=True))
+    for name in LAZY_UI:
+        parts.append(wrap_module(name, read(SRC / "Client" / f"{name}.luau"), lazy=True))
 
     server_init = re.sub(
         r"require\(([^()]*(?:\([^()]*\))?[^()]*)\)", map_require, read(SRC / "Server" / "init.server.luau")

@@ -20,6 +20,7 @@ local TanamService = require(Modules.TanamService)
 local GudangService = require(Modules.GudangService)
 local DropService = require(Modules.DropService)
 local WorldBuilder = require(Modules.WorldBuilder)
+local TradeService = require(Modules.TradeService)
 
 Net.init()
 
@@ -69,6 +70,7 @@ ZonaService.bind(deps)
 TanamService.bind(deps)
 GudangService.bind(deps)
 DropService.bind(deps)
+TradeService.bind(deps)
 
 local function openSemai(player: Player, lahanIdx: number)
         if LandService.ownerOf(lahanIdx) ~= player.UserId then
@@ -193,6 +195,7 @@ end
 
 local function tutupSesi(player: Player)
         TanamService.leave(player)
+        TradeService.hilang(player)
         ZonaService.leaveGame(player)
         DataService.save(player)
         RateLimit.clear(player.UserId)
@@ -258,6 +261,10 @@ Net.get("PlotAct").OnServerInvoke = function(player, idx, action)
         if not RateLimit.allow(player.UserId, "punch", 12, 18) then
                 return lajuDitolak(player, "punch")
         end
+        local denyTrade = TradeService.blokir(player)
+        if denyTrade then
+                return false, denyTrade
+        end
         if action == "punch" then
                 return denganTransaksi(player, function()
                         return PlotService.punch(player, idx)
@@ -270,6 +277,10 @@ end
 Net.get("TanamAct").OnServerInvoke = function(player, action, a, b)
         if not RateLimit.allow(player.UserId, "tanam", 6, 10) then
                 return lajuDitolak(player, "tanam")
+        end
+        local denyTrade = TradeService.blokir(player)
+        if denyTrade then
+                return false, denyTrade
         end
         if action == "start" then
                 return denganTransaksi(player, function()
@@ -296,6 +307,10 @@ Net.get("GudangAct").OnServerInvoke = function(player, action, a, b)
         if not RateLimit.allow(player.UserId, "gudang", 6, 10) then
                 return lajuDitolak(player, "gudang")
         end
+        local denyTrade = TradeService.blokir(player)
+        if denyTrade then
+                return false, denyTrade
+        end
         if action == "simpan" then
                 return denganTransaksi(player, function()
                         return GudangService.simpan(player, a, b)
@@ -312,6 +327,10 @@ end
 Net.get("SemaiAct").OnServerInvoke = function(player, action, a, b)
         if not RateLimit.allow(player.UserId, "semai", 8, 12) then
                 return lajuDitolak(player, "semai")
+        end
+        local denyTrade = TradeService.blokir(player)
+        if denyTrade then
+                return false, denyTrade
         end
         local deny = ZonaService.mutationDeny(player)
         if deny then
@@ -338,6 +357,10 @@ Net.get("ShopAct").OnServerInvoke = function(player, action, a, b)
         if not RateLimit.allow(player.UserId, "shop", 8, 14) then
                 return lajuDitolak(player, "shop")
         end
+        local denyTrade = TradeService.blokir(player)
+        if denyTrade then
+                return false, denyTrade
+        end
         if action == "buy" then
                 return denganTransaksi(player, function()
                         return ShopService.buy(player, a)
@@ -349,6 +372,25 @@ Net.get("ShopAct").OnServerInvoke = function(player, action, a, b)
         end
         AuditService.catat(player, "argumen", "shop:" .. tostring(action))
         return false, "Aksi tidak dikenal."
+end
+
+Net.get("TradeAct").OnServerInvoke = function(player, action, a)
+        if not RateLimit.allow(player.UserId, "trade", 4, 10) then
+                return lajuDitolak(player, "trade")
+        end
+        if action == "ajukan" then
+                return TradeService.ajukan(player, a)
+        elseif action == "ubah" then
+                return TradeService.ubah(player, a)
+        elseif action == "setuju" then
+                return TradeService.setuju(player)
+        elseif action == "konfirm" then
+                return TradeService.konfirm(player)
+        elseif action == "batal" then
+                return TradeService.batal(player)
+        end
+        AuditService.catat(player, "argumen", "trade:" .. tostring(action))
+        return false, "Aksi trade tidak dikenal."
 end
 
 Net.get("RedeemDevCode").OnServerInvoke = function(player, code)
@@ -372,5 +414,6 @@ end
 DataService.startLoops()
 ZonaService.startLoops()
 CurrencyService.startIntegritas()
+TradeService.startLoops()
 
 print("[AKIOMIDA] Server-authoritative: ekonomi 1000T, deteksi anomali tanpa batas angka tetap, transaksi terjaga, kick aman-data siap.")

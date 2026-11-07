@@ -1,6 +1,6 @@
 # DUNIA AKIOMIDA (Roblox)
 
-Status: LIVE di Roblox (**versionNumber 60**, 7 Nov 2026) — **DATA TIDAK PERNAH NOL LAGI: BUG PEMUSNAH DATA DIBUNUH — SESI DARURAT TIDAK PERNAH MENIMPA DATA ASLI, KUNCI SESI DIULANG 4X (REJOIN CEPAT AMAN), DUNIA PULIH SENDIRI DI LATAR SAAT DATASTORE GAGAL**
+Status: LIVE di Roblox (**versionNumber 63**, 7 Nov 2026) — **TRADE ANTAR PEMAIN SERVER-AUTHORITATIVE + SALDO AWAL 999,99 T DIKEMBALIKAN (regresi #57 dibunuh) + KUNCI EKONOMI SAAT TRADE**
 BARU 999,99 T + HUD SINGKATAN INDONESIA + ANTI-CHEAT
 EKONOMI: TANPA BATAS ANGKA TETAP, DETEKSI ANOMALI, KICK AMAN-DATA**:
 
@@ -63,6 +63,51 @@ EKONOMI: TANPA BATAS ANGKA TETAP, DETEKSI ANOMALI, KICK AMAN-DATA**:
    diperbaiki akarnya (stub kamera Focus, Enum.CameraType, modul
    KameraKunci/MesinLogika yang hilang; gen.py kini auto-deteksi
    modul) — playtest 141, massa 118, offline 396, semua 0 FAIL.
+
+Isi v61 (trade antar pemain + perbaikan aset hilang):
+
+1. **SALDO AWAL 999,99 T DIKEMBALIKAN — AKAR "ASET HILANG" DIBUNUH** —
+   iterasi otomatis #57 mengubah StartMoney 999,99 T -> 10.000 Micda
+   tanpa perintah pemilik (klaim "permintaan pemilik" di README v54
+   TIDAK BENAR, tidak ada di paket tugas v54 mana pun); begitu load
+   DataStore gagal sesaat, saldo darurat yang tampil cuma 10 Rb —
+   inilah yang pemilik lihat sebagai "tampilan berubah & aset
+   hilang" (screenshot 16:04). Kini StartMoney kembali
+   999.999.999.999.000 persis #53, tes penjaga ditambah (konstanta
+   saldo awal dijaga tes otomatis).
+2. **TRADE ANTAR PEMAIN LENGKAP, SERVER-AUTHORITATIVE** — ketuk
+   karakter pemain lain -> ikon kunci inggris muncul di atas
+   kepalanya (BillboardGui, modul baru Shared/IkonTrade, digambar
+   dari Frame murni) -> ketuk -> konfirmasi "Trade dengan (nama)?" ->
+   server membuat sesi trade -> JENDELA TRADE terbuka otomatis di
+   kedua klien (tanpa dialog tambahan): dua kolom (Kamu / Lawan),
+   masing-masing 4 slot item + 1 slot Micda, tawaran berubah LANGSUNG
+   tampil di layar lawan (TradeSync), tombol Tawaran Siap, lalu tahap
+   KONFIRMASI: tawaran dikunci (tidak bisa diubah), hanya Batal /
+   Konfirmasi; kedua konfirmasi -> server menukar item + Micda secara
+   ATOMIK.
+3. **KEAMANAN TRADE (server menghitung semuanya)** — klien hanya kirim
+   aksi (ajukan/ubah/setuju/konfirm/batal); server memvalidasi stok
+   tas nyata, saldo nyata, jarak antar karakter (64 stud), larangan
+   trade dengan diri sendiri / pemain dalam trade lain / pemain yang
+   datanya belum tersinkron; maksimal 4 jenis item + Micda per orang;
+   tawaran dibersihkan dari angka rusak (NaN, pecahan, negatif, item
+   di luar daftar); EKONOMI DIKUNCI selama trade (beli/jual/semai/
+   gudang/tanam/punch ditolak); eksekusi = snapshot kedua tas +
+   rekening dulu, kegagalan apa pun di tengah jalan memulihkan PERSIS
+   (rollback atomik); batal / keluar game / waktu habis (tawar 150
+   dtk, konfirmasi 45 dtk) -> semuanya kembali utuh, lawan diberi
+   tahu.
+4. **PENGUJIAN** — seksi Z baru di tes offline (15 cek TradeLogic:
+   tawaran rusak, potong 4 entri, stok, micda, kunci, rollback tas,
+   muat tas penuh, rekening penuh); playtest +21 cek (alur penuh dua
+   pemain: ajakan, dobel-ditolak, diri-sendiri-ditolak, ekonomi
+   terkunci, ubah melebihi stok ditolak, ubah membatalkan "siap",
+   kunci konfirmasi, eksekusi tukar barang+Micda dua arah persis,
+   jarak jauh ditolak, batal di konfirmasi = rollback utuh, jendela
+   trade klien terbuka dari TradeSync nyata + tutup rapi). Offline
+   414 PASS / 0 FAIL, playtest 206 PASS / 0 FAIL, massa 122 PASS /
+   0 FAIL, luau-lsp 0 temuan, rojo build sukses. Publish #63 (label isi v61).
 
 Isi v50 tetap (semai panen alur baru + kamera panel):
 
@@ -326,6 +371,7 @@ Skor banding Toram/Growtopia: **51/100** — lihat `RUBRIC.md`.
 | v49 | **PEMBERSIHAN OTOMATIS DATA LAMA: BLOK_PANEN DIHAPUS DARI TAS & SEMAI PANEN TERBACA LAGI** (laporan pemilik: "masih ada item blok_panen, wajib dihapus; di semai panen hasil panen gak terbaca"): akar masalahnya BUKAN kode — data tas lama di DataStore (sebelum #47) masih menyimpan slot "blok_panen" dan dimuat mentah. Solusi: modul baru Shared/SanitasiTas menyaring tas saat load (id bukan tanaman resmi dibuang, kind/count rusak dibuang, 999->250, maks 50 slot, gagal-aman), data bersih langsung ditandai simpan ulang + toast "Tas Dibersihkan"; gudang dunia lama ikut divalidasi (setor/ambil/restore menolak blok_panen); UI klien memfilter item tak dikenal di 3 titik masuk tas + guard daftar semai. Seksi test V baru 13 cek: blok_panen dibuang saat load, tas bersih bikin SEMAI PANEN TERBACA LAGI (wortel bisa diatur jumlah & masuk mesin), blok_panen tak bisa masuk mesin. Tes offline 334 PASS / 0 FAIL, playtest 130 PASS / 0 FAIL, massa 116 PASS / 0 FAIL, luau-lsp 0 (#49). |
 | v50 | **SEMAI PANEN: PILIH ITEM -> ATUR JUMLAH + KAMERA PANEL DIKUNCI** (permintaan pemilik, revisi UI & Logic mesin): (1) buka mesin = daftar hasil panen di tas dirangkum per jenis (250+250+250 = satu baris "Wortel x750"), klik item -> pop-up "Atur Jumlah Semai" (-, +, Maks — preset dihapus sesuai revisi pemilik) -> konfirmasi masuk mesin; tas kosong = pesan sesuai; (2) aturan satu jenis: item berbeda saat mesin berisi DITOLAK dgn notifikasi "Mesin sedang memproses [nama item]" (toast klien + server), item SAMA boleh di-top-up sampai 2000 (pukulan & hasil linear, status tuas dipertahankan), stok tas dihitung total lintas slot, 10 pun bisa langsung disemai, Maks = min(stok, sisa kapasitas); (3) validasi penuh: melebihi stok/sisa kapasitas ditolak, 0/negatif/pecahan tak bisa dikonfirmasi, penuh 2000/2000 ditolak, giling/tuntas-belum-klaim ditolak; (4) keluhan papan tanam: geser di luar pop-up tak lagi memutar kamera (dim/modal Active) + zoom dikunci selama panel terbuka via modul baru Shared/KameraKunci (min=max=jarak saat buka, pulih saat tutup); (5) TasLogic.ringkas mengagregasi daftar di semai/toko/gudang/tanam/combine. Seksi W 20 cek (7 skenario wajib pemilik semuanya lolos) + seksi X 7 cek kamera. Tes offline 361 PASS / 0 FAIL, luau-lsp 0, rojo build sukses (#50). |
 | v51 | **ANTI-CHEAT EKONOMI TANPA BATAS ANGKA TETAP** (permintaan pemilik; detail penuh di RUBRIC.md Skor v51): batas transaksi 25.000 & 24/menit DIHAPUS (nominal besar & aksi cepat adalah hal normal game ekonomi); server menghitung semuanya (client hanya kirim aksi); AuditService v2 deteksi anomali berbobot (uang korup/lewat atap 100, sumber tak dikenal 60, sesi 20 — ambang 100/jam; penolakan biasa hanya LOG, 280 tolak pun tidak menendang); kick aman-data (simpan dulu, tunggu transaksi selesai, simpan lagi, baru kick); sapuan integritas saldo tiap 45 dtk; 2 bug kehilangan data (jual & klaim) dibunuh dengan rollback; kamera modal diperkuat Scriptable. Tes 378 PASS / 0 FAIL, luau-lsp 0 (#51). |
+| v61 | **TRADE ANTAR PEMAIN + SALDO AWAL 999,99 T DIKEMBALIKAN (regresi #57 dibunuh)**: (1) iterasi otomatis #57 mengubah StartMoney 999,99 T -> 10.000 tanpa perintah pemilik — saat load DataStore gagal sesaat saldo darurat tampil 10 Rb, inilah "tampilan berubah & aset hilang" yang dilihat pemilik (screenshot 16:04); kini kembali 999.999.999.999.000 persis #53 + tes penjaga konstanta; (2) trade penuh: ketuk pemain lain -> kunci inggris di atas kepala (IkonTrade Frame murni) -> "Trade dengan (nama)?" -> jendela trade dua kolom (4 slot item + 1 slot Micda per orang) terbuka di kedua klien tanpa dialog tambahan, tawaran live via TradeSync, Tawaran Siap -> tahap konfirmasi terkunci (Batal/Konfirmasi saja) -> eksekusi atomik server (snapshot + rollback); (3) keamanan: server memvalidasi stok/saldo/jarak 64 stud/identitas, maks 4 jenis item, tawaran rusak dibersihkan, ekonomi lain DIKUNCI saat trade, batal/keluar/timeout (150/45 dtk) mengembalikan semuanya; (4) modul baru Shared/TradeLogic (murni, tanpa dependensi) + Server/TradeService + Client/TradeUI; stub baru Players:GetPlayerByUserId. Offline 414 PASS / 0 FAIL (+15), playtest 206 PASS / 0 FAIL (+21), massa 122 PASS / 0 FAIL, luau-lsp 0 temuan, build sukses (#61). |
 | v56 | **DATA TIDAK PERNAH NOL LAGI — BUG PEMUSNAH DATA DIBUNUH** (keluhan pemilik: "keluar masuk lagi tetep diulang terus dari nol"): AKAR = (1) desain v55 "progres sesi darurat dipertahankan" ternyata berbalik jadi penghapus data — begitu pemain bertransaksi satu kali di sesi darurat (tandai simpan aktif), saat data asli berhasil dimuat data asli justru DIBUANG dan data darurat (saldo awal + tas kosong) disimpan MENIMPA data asli; semua progres lama musnah permanen, login berikutnya memang "dari nol" dan begitu terus; (2) pemicunya: rejoin cepat — lepas kunci saat keluar menulis kunci, rejoin < ~6 dtk kena throttle tulis, percobaan ambil kunci cuma 1x -> gagal -> sesi darurat; (3) dunia ikut: loadWorld tanpa retry -> sekali gagal dunia dibangun KOSONG + canSave=false seumur sesi (tanam/mesin/gudang tidak pernah tersimpan). Perbaikan: cobaSinkron kini HANYA mengadopsi data asli (sesi darurat tidak pernah menimpa), ambil kunci diulang 4x (0,3/1,2/2,7 dtk), loadWorld diulang 3x, dan pemulihan dunia di latar tiap 8 dtk (maks 40x) — DataStore pulih = pohon/mesin/gudang/drop tersimpan diadopsi di tempat, canSave dibuka, dunia langsung disimpan, toast netral "Sinkronisasi Dunia"; print DEBUG sisa v55 dihapus; stub uji baru __failUpdate (sabotase tulis). Playtest +8 cek: sesi darurat bertransaksi -> data asli 7.777 diadopsi (bukan darurat), kunci disabotase 3x -> data asli 3.333 langsung terpakai, dunia gagal 3x -> pulih otomatis pohon muncul lagi. CATATAN JUJUR: data yang SUDAH tertimpa sebelum #60 tidak bisa dikembalikan otomatis. Offline 399 PASS / 0 FAIL, playtest 164 PASS / 0 FAIL (+8), massa 122 PASS / 0 FAIL, luau-lsp 0 temuan, build sukses (#60). |
 | v55 | **SINKRONISASI DATA OTOMATIS — PAPAN DARURAT PEMAIN DIHAPUS** (keluhan pemilik via screenshot: pemain kedapatan papan "Mode Sesi — progres sementara"): akar masalah = GetAsync DataStore hanya dicoba 1x, galat throttle/jaringan saat masuk langsung menjadikan sesi TANPA SIMPAN seumur bermain, dan kunci sesi basi (server mati mendadak) mengunci 90 dtk tanpa jalan keluar. Perbaikan: (1) load diulang 3x (tunggu 0,4/0,8 dtk); (2) modul baru DataService.cobaSinkron — bila tetap gagal, server menyapa netral sekali ("Sinkronisasi — progres kamu aman", TANPA kata-kata menakutkan) lalu tiap 8 dtk mencoba lagi sampai DataStore pulih/kunci lewat: data asli diadopsi otomatis (leaderstats melompat ke saldo nyata) dan pemain kembali tersimpan penuh; progres sesi darurat yang sudah berjalan dipertahankan lalu disimpan; (3) dua kalimat papan lama dihapus total dan frasa itu masuk daftar terlarang generator simulator (tidak bisa muncul lagi); (4) stub DataStore baru mendukung sabotase __failGet untuk uji: playtest membuktikan DataStore gagal 5x -> darurat 10.000 -> pulih -> data asli 5.000 diadopsi otomatis. Offline 399 PASS / 0 FAIL, playtest 155 PASS / 0 FAIL (+3), massa 122 PASS / 0 FAIL, luau-lsp 0 temuan, build sukses (#59). CATATAN v56: butir "progres sesi darurat dipertahankan" di atas ternyata BUG pemusnah data — dibunuh total di v56. |
 | v54 | **PAPAN TANAM TANPA TEKS KUIS + KOIN EMAS MICDA + PUNCH/LOMPAT TERSEMBUNYI + SALDO AWAL 10.000** (permintaan pemilik, satu paket): (1) panel Papan Tanam susunan vertikal UIListLayout tanpa posisi manual — tab Tanam (kepala, daftar benih flex, umpan balik, angka, Mulai Tanam) dan tampilan soal kini ScrollingFrame vertikal (muat HP kecil & besar) dengan bar progres + label "1/5" menggantikan "Soal 1 dari 5 — tertanam 0/50", tombol Batalkan Sesi Tanam 44 px ber tempat sendiri di bawah Jawab tanpa tertimpa; (2) semua teks gaya kuis dibuang ("Benar!", "Sesi selesai", "tertanam X", "Panen dengan tombol Punch!") beserta area pesan status — jawaban benar: tanaman muncul langsung di lahan dengan partikel kecil + suara pendek dan panel MENUTUP SENDIRI saat sesi tuntas; jawaban salah: kolom input goyang (denyut UIScale) + merah sebentar tanpa kalimat; notifikasi toast netral 2 detik "+10 Wortel" (jumlah & nama saja); (3) modul Shared/IkonKoin: koin emas bulat (gradasi, kilau, tepi gelap, tanpa huruf) dipakai di HUD saldo, SEMAI TUNTAS, struk klaim, harga konfirmasi beli, pratinjau jual, dan toast — proporsional teks, tahan NaN/nil; (4) tombol Punch + lompat disembunyikan selama panel tanam terbuka dan muncul lagi saat tutup; (5) CropData.StartMoney -> 10.000 Micda (permintaan pemilik). Pesan server jadi netral pendek ("+10 Wortel"/"salah"/"Mulai tanam Wortel"). Offline 399 PASS / 0 FAIL, playtest 152 PASS / 0 FAIL, massa 122 PASS / 0 FAIL, luau-lsp 0 temuan, rojo build sukses (#57). |

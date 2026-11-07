@@ -20,6 +20,8 @@ local DEFINITIONS = {
         ShopAct = "RemoteFunction",
         TanamAct = "RemoteFunction",
         GudangAct = "RemoteFunction",
+        TradeAct = "RemoteFunction",
+        TradeSync = "RemoteEvent",
         RedeemDevCode = "RemoteFunction",
 }
 

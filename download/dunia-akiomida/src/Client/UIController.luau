@@ -36,6 +36,7 @@ local state = {
         role = "hub",
         gudang = nil,
         tanam = nil,
+        trade = nil :: any,
 }
 
 local function fmt(n: number): string
@@ -125,6 +126,7 @@ local PANEL_TITLES = {
         gerbang = "Gerbang Dunia",
         tanam = "Papan Tanam",
         gudang = "Gudang Hasil Panen",
+        trade = "Trade",
 }
 
 local function mk(class: string, props: { [string]: any }, parent: Instance?): Instance
@@ -190,6 +192,11 @@ local travelBtn = mk("TextButton", { LayoutOrder = 2, Size = UDim2.fromScale(1, 
 round(travelBtn)
 mk("UIPadding", { PaddingLeft = UDim.new(0, 12), PaddingRight = UDim.new(0, 12) }, travelBtn)
 local navUkuran = mk("UISizeConstraint", { MinSize = Vector2.new(120, 26), MaxSize = Vector2.new(220, 26) }, travelBtn)
+
+local tradeLanjutBtn = mk("TextButton", { Name = "LanjutTrade", LayoutOrder = 3, Size = UDim2.fromScale(1, HUDLayout.NavSkalaTinggi), AutomaticSize = Enum.AutomaticSize.X, BackgroundColor3 = warna(UIStyle.PermukaanAktif), Text = "Lanjutkan Trade", TextSize = UIStyle.UkuranIsi, Font = FONTB, TextColor3 = warna(UIStyle.Teks), TextTruncate = Enum.TextTruncate.AtEnd, TextXAlignment = Enum.TextXAlignment.Center, Visible = false }, kolomKiri)
+round(tradeLanjutBtn)
+mk("UIPadding", { PaddingLeft = UDim.new(0, 12), PaddingRight = UDim.new(0, 12) }, tradeLanjutBtn)
+mk("UISizeConstraint", { MinSize = Vector2.new(120, 26), MaxSize = Vector2.new(220, 26) }, tradeLanjutBtn)
 
 local tasBtn = mk("TextButton", { AnchorPoint = Vector2.new(1, 0), Position = UDim2.fromScale(0.992, HUDLayout.SaldoSkalaY), Size = UDim2.fromScale(HUDLayout.TasSkalaLebar, HUDLayout.SaldoSkalaTinggi), BackgroundColor3 = warna(UIStyle.PermukaanAktif), Text = "Tas", TextSize = UIStyle.UkuranIsi, Font = FONTB, TextColor3 = warna(UIStyle.Teks) }, aman)
 round(tasBtn)
@@ -390,7 +397,7 @@ local function openPanel(name: string)
                 f.Visible = n == name
         end
         panelTitle.Text = PANEL_TITLES[name] or ""
-        if name == "semai" or name == "tanam" then
+        if name == "semai" or name == "tanam" or name == "trade" then
                 panelBatas.MaxSize = Vector2.new(760, 620)
         else
                 panelBatas.MaxSize = Vector2.new(UIStyle.LebarPanelMaks, UIStyle.TinggiPanelMaks)
@@ -398,7 +405,7 @@ local function openPanel(name: string)
         kunciKamera()
         dim.Visible = true
         currentPanel = name
-        if name == "tanam" then
+        if name == "tanam" or name == "trade" then
                 sembunyikanKontrol()
         end
 end
@@ -1739,6 +1746,33 @@ local function eksekusiPunch()
         end)
 end
 
+-- ===================== TRADE ANTAR PEMAIN =====================
+-- Seluruh UI trade antar pemain kini tinggal di modul TradeUI (lihat
+-- src/Client/TradeUI.luau): tap pemain lain -> kunci inggris -> konfirmasi ->
+-- jendela trade dua kolom dengan sinkron server lewat TradeSync.
+require(script.Parent.TradeUI).bangun({
+        gui = gui,
+        playerGui = playerGui,
+        player = player,
+        camera = camera,
+        mk = mk,
+        round = round,
+        warna = warna,
+        toast = toast,
+        fmt = fmt,
+        ikonSlot = ikonSlot,
+        makePanel = makePanel,
+        openPanel = openPanel,
+        closePanel = closePanel,
+        panelAktif = function()
+                return currentPanel
+        end,
+        state = state,
+        tradeLanjutBtn = tradeLanjutBtn,
+        FON = FON,
+        FONTB = FONTB,
+})
+-- ================== AKHIR TRADE ANTAR PEMAIN ==================
 punchBtn.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
                 if input.UserInputState ~= Enum.UserInputState.Begin or pegangPunch then

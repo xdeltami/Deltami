@@ -67,7 +67,7 @@ end
 print("--- Sistem inti ---")
 do
         check("Waktu tumbuh 3 detik", CropData.GrowTime == 3, tostring(CropData.GrowTime))
-        check("Dana awal pemain baru 10.000 Micda", CropData.StartMoney == 10000, tostring(CropData.StartMoney))
+        check("Dana awal pemain baru 999,99 T Micda", CropData.StartMoney == 999999999999000, tostring(CropData.StartMoney))
         check("Tas 50 slot", CropData.TasSlots == 50 and TasLogic.MaxSlots == 50, "-")
         check("Stack 250", CropData.TasStack == 250 and TasLogic.MaxStack == 250, "-")
         check("Benih wajib bernama 'Benih X'", CropData.namaBenih("wortel") == "Benih Wortel" and CropData.namaBenih("jeruk_mandarin") == "Benih Jeruk Mandarin" and CropData.namaBenih("kacang_tanah") == "Benih Kacang Tanah", tostring(CropData.namaBenih("wortel")))
@@ -909,13 +909,13 @@ do
         check("1 T persis contoh pemilik", UangSingkat.singkat(1000000000000) == "1 T", UangSingkat.singkat(1000000000000))
         check("999.999.999.999.999 = 999,99 T (floor, bukan 1.000 T)", UangSingkat.singkat(999999999999999) == "999,99 T", UangSingkat.singkat(999999999999999))
         check("Atap 1000 Triliun = 1.000 T dan tetap muat HUD", UangSingkat.singkat(1000000000000000) == "1.000 T", UangSingkat.singkat(1000000000000000))
-        check("Saldo awal baru tampil 10 Rb", UangSingkat.singkat(CropData.StartMoney) == "10 Rb", UangSingkat.singkat(CropData.StartMoney))
-        check("Ketuk saldo: angka lengkap 10.000 bertitik", UangSingkat.penuh(CropData.StartMoney) == "10.000", UangSingkat.penuh(CropData.StartMoney))
+        check("Saldo awal tampil 999,99 T", UangSingkat.singkat(CropData.StartMoney) == "999,99 T", UangSingkat.singkat(CropData.StartMoney))
+        check("Ketuk saldo: angka lengkap 999.999.999.999.000 bertitik", UangSingkat.penuh(CropData.StartMoney) == "999.999.999.999.000", UangSingkat.penuh(CropData.StartMoney))
         check("Input rusak aman (NaN/negatif/teks/nil = 0)", UangSingkat.singkat(0 / 0) == "0" and UangSingkat.singkat(-5) == "0" and UangSingkat.singkat("x") == "0" and UangSingkat.penuh(nil) == "0", "-")
         check("Floor tidak pernah melebihi saldo (1,239 T = 1,23 T)", UangSingkat.singkat(1239000000000) == "1,23 T", UangSingkat.singkat(1239000000000))
         local stAwal = UangLogic.baru(CropData.StartMoney)
         check("Saldo awal baru tidak dijepit saat dimuat", UangLogic.saldo(stAwal) == CropData.StartMoney, tostring(UangLogic.saldo(stAwal)))
-        check("Ruang rekening baru = atap 1000 T dikurangi 10.000", UangLogic.ruangSisa(stAwal) == 999999999990000, tostring(UangLogic.ruangSisa(stAwal)))
+        check("Ruang rekening baru = atap 1000 T dikurangi 999,99 T", UangLogic.ruangSisa(stAwal) == 1000, tostring(UangLogic.ruangSisa(stAwal)))
 end
 
 print("--- I: Kunci sesi (anti-dua-server) ---")
@@ -1357,6 +1357,67 @@ do
         check("Ukuran koin proporsional teks (22 px teks -> 23 px koin)", IkonKoin.ukuran(22) == 23, tostring(IkonKoin.ukuran(22)))
         check("Ukuran koin minimal 12 px", IkonKoin.ukuran(4) == 12 and IkonKoin.ukuran(nil) == 12, tostring(IkonKoin.ukuran(4)) .. "/" .. tostring(IkonKoin.ukuran(nil)))
         check("Ukuran koin tahan input rusak", IkonKoin.ukuran("x") == 12 and IkonKoin.ukuran(0 / 0) == 12, "-")
+end
+
+print("--- Z: TradeLogic (trade antar pemain, server-authoritative) ---")
+do
+        local TradeLogic = require("./../src/Shared/TradeLogic")
+        local UangLogic = require("./../src/Shared/UangLogic")
+        check("Konstanta selaras TasLogic & UangLogic (anti-drift)", TradeLogic.TasSlotMaks == TasLogic.MaxSlots and TradeLogic.TasStackMaks == TasLogic.MaxStack and TradeLogic.MaksSaldo == UangLogic.MaksSaldo, tostring(TradeLogic.TasSlotMaks) .. "/" .. tostring(TradeLogic.MaksSaldo))
+        check("Maksimal 4 jenis item per tawaran", TradeLogic.MaksEntri == 4, tostring(TradeLogic.MaksEntri))
+
+        local byId = CropData.byId
+        local e = TradeLogic.rapikan({ items = { { kind = "benih", id = "wortel", count = 5 } }, micda = 100 }, byId)
+        check("Tawaran sah dirapikan utuh", #e.items == 1 and e.items[1].count == 5 and e.micda == 100, "-")
+
+        local kotor = TradeLogic.rapikan({ items = { { kind = "alat", id = "wortel", count = 5 }, { kind = "benih", id = "x_x", count = 1 }, { kind = "benih", id = "wortel", count = 0 / 0 }, { kind = "benih", id = "wortel", count = 2.5 }, { kind = "benih", id = "wortel", count = 3 } }, micda = -5 }, byId)
+        check("Tawaran rusak dibersihkan (kind asing, id aneh, NaN, pecahan, micda negatif)", #kotor.items == 1 and kotor.items[1].count == 3 and kotor.micda == 0, tostring(#kotor.items) .. "/" .. tostring(kotor.micda))
+
+        local campur = {}
+        local ids = { "wortel", "pisang", "bayam", "kentang", "tebu", "jamur" }
+        for _, id in ipairs(ids) do
+                table.insert(campur, { kind = "hasil", id = id, count = 1 })
+        end
+        local lebih = TradeLogic.rapikan({ items = campur, micda = 0 }, byId)
+        check("Enam jenis beda dipotong ke 4 entri", #lebih.items == 4, tostring(#lebih.items))
+
+        local tas = { { kind = "benih", id = "wortel", count = 10 }, { kind = "hasil", id = "pisang", count = 7 } }
+        local ok1 = TradeLogic.tawaranSah({ items = { { kind = "benih", id = "wortel", count = 10 } }, micda = 0 }, byId, tas, 100)
+        check("Tawaran pas dengan stok sah", ok1, "-")
+        local ok2, msg2 = TradeLogic.tawaranSah({ items = { { kind = "benih", id = "wortel", count = 11 } }, micda = 0 }, byId, tas, 100)
+        check("Tawaran melebihi stok DITOLAK", not ok2 and msg2 == "Item tidak cukup di tas.", tostring(msg2))
+        local ok3, msg3 = TradeLogic.tawaranSah({ items = {}, micda = 101 }, byId, tas, 100)
+        check("Micda melebihi saldo DITOLAK", not ok3, tostring(msg3))
+        local ok4 = TradeLogic.tawaranSah({ items = { { kind = "hasil", id = "naga_misterius", count = 1 } }, micda = 0 }, byId, tas, 100)
+        check("Item di luar CropData DITOLAK", not ok4, "-")
+
+        local kunci = TradeLogic.kunciOf({ items = { { kind = "benih", id = "wortel", count = 4 }, { kind = "benih", id = "wortel", count = 2 } }, micda = 0 })
+        check("Kunci menghitung total per jenis item", kunci["benih:wortel"] == 6, tostring(kunci["benih:wortel"]))
+
+        local salinan = TradeLogic.klonTas(tas)
+        TradeLogic.pasangKembali(tas, salinan)
+        check("Rollback tas: isi dikembalikan persis", #tas == 2 and tas[1].count == 10 and tas[2].id == "pisang", tostring(#tas))
+
+        local addT, remT = TasLogic.add, TasLogic.remove
+        local tasPenuh = {}
+        for _ = 1, 50 do
+                table.insert(tasPenuh, { kind = "hasil", id = "wortel", count = 250 })
+        end
+        local muat1 = TradeLogic.muatCukup(tasPenuh, { items = { { kind = "hasil", id = "wortel", count = 250 } }, micda = 0 }, { items = { { kind = "hasil", id = "pisang", count = 10 } }, micda = 0 }, addT, remT)
+        check("Tas penuh muat setelah barang keluar ditarik (250 wortel keluar, 10 pisang masuk)", muat1, "-")
+        local muat2 = TradeLogic.muatCukup(tasPenuh, { items = { { kind = "hasil", id = "wortel", count = 10 } }, micda = 0 }, { items = { { kind = "hasil", id = "pisang", count = 10 } }, micda = 0 }, addT, remT)
+        check("Tas penuh tanpa slot bebas DITOLAK (10 wortel keluar menyisakan stack, pisang tak muat)", not muat2, "-")
+
+        local okE, msgE = TradeLogic.eksekusiSah(
+                { items = { { kind = "benih", id = "wortel", count = 5 } }, micda = 1000 },
+                { items = { { kind = "hasil", id = "pisang", count = 7 } }, micda = 500 },
+                tas, 10000, TradeLogic.klonTas(tas), 10000, byId, addT, remT)
+        check("Eksekusi dua sisi saling menukar: SAH", okE, tostring(msgE))
+        local okF, msgF = TradeLogic.eksekusiSah(
+                { items = {}, micda = 900000000000000 },
+                { items = {}, micda = 500 },
+                { {} }, TradeLogic.MaksSaldo, { {} }, TradeLogic.MaksSaldo - 100, byId, addT, remT)
+        check("Rekening penerima tinggal 100 Micda ruang: tawaran 900 T DITOLAK", not okF, tostring(msgF))
 end
 
 print(("="):rep(28))
