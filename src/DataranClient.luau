@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GuiService = game:GetService("GuiService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -11,7 +12,7 @@ end
 local GameConfig = require(ReplicatedStorage:WaitForChild("GameConfig"))
 local Remotes = require(ReplicatedStorage:WaitForChild("Remotes"))
 
-local keadaan = {Koin = GameConfig.KoinAwal, Tas = {}}
+local keadaan = {Micda = GameConfig.MicdaAwal, Tas = {}}
 local tabAktif = "Toko"
 local kategoriAktif = "Semua"
 local petakDipilih = nil
@@ -25,6 +26,99 @@ local function buat(kelas, sifat, induk)
 	objek.Parent = induk
 	return objek
 end
+
+local hud = buat("ScreenGui", {Name = "MicdaHud", ResetOnSpawn = false, IgnoreGuiInset = true, DisplayOrder = 20}, playerGui)
+
+local pil = buat("TextButton", {
+	Name = "PilMicda",
+	AnchorPoint = Vector2.new(0.5, 0),
+	Position = UDim2.new(0.5, 0, 0, 70),
+	Size = UDim2.new(0, 220, 0, 44),
+	BackgroundColor3 = Color3.fromRGB(24, 26, 22),
+	BackgroundTransparency = 0.12,
+	BorderSizePixel = 0,
+	Text = "",
+	AutoButtonColor = false,
+}, hud)
+buat("UICorner", {CornerRadius = UDim.new(1, 0)}, pil)
+buat("UIStroke", {Color = Color3.fromRGB(212, 175, 55), Thickness = 2, Transparency = 0.25}, pil)
+
+local ikon = buat("Frame", {
+	Name = "IkonMicda",
+	Position = UDim2.new(0, 9, 0.5, -13),
+	Size = UDim2.new(0, 26, 0, 26),
+	BackgroundColor3 = Color3.fromRGB(246, 198, 62),
+	BorderSizePixel = 0,
+}, pil)
+buat("UICorner", {CornerRadius = UDim.new(1, 0)}, ikon)
+buat("UIStroke", {Color = Color3.fromRGB(150, 104, 18), Thickness = 2}, ikon)
+buat("TextLabel", {
+	Text = "M",
+	Size = UDim2.new(1, 0, 1, 0),
+	BackgroundTransparency = 1,
+	TextColor3 = Color3.fromRGB(126, 86, 10),
+	TextScaled = true,
+	Font = Enum.Font.GothamBlack,
+}, ikon)
+
+buat("TextLabel", {
+	Text = "MICDA",
+	Position = UDim2.new(0, 44, 0, 6),
+	Size = UDim2.new(0, 64, 0, 12),
+	BackgroundTransparency = 1,
+	TextColor3 = Color3.fromRGB(214, 178, 92),
+	TextScaled = true,
+	Font = Enum.Font.GothamBold,
+	TextXAlignment = Enum.TextXAlignment.Left,
+}, pil)
+
+local labelPil = buat("TextLabel", {
+	Name = "JumlahMicda",
+	Text = "0",
+	Position = UDim2.new(0, 44, 0, 18),
+	Size = UDim2.new(1, -98, 0, 22),
+	BackgroundTransparency = 1,
+	TextColor3 = Color3.fromRGB(255, 222, 130),
+	TextScaled = true,
+	Font = Enum.Font.GothamBlack,
+	TextXAlignment = Enum.TextXAlignment.Left,
+}, pil)
+
+local labelPenuh = buat("TextLabel", {
+	Name = "MicdaPenuh",
+	AnchorPoint = Vector2.new(0.5, 0),
+	Position = UDim2.new(0.5, 0, 1, 6),
+	Size = UDim2.new(1.4, 0, 0, 24),
+	BackgroundColor3 = Color3.fromRGB(18, 20, 16),
+	BackgroundTransparency = 0.1,
+	TextColor3 = Color3.fromRGB(255, 222, 130),
+	TextScaled = true,
+	Font = Enum.Font.GothamBold,
+	BorderSizePixel = 0,
+	Visible = false,
+}, pil)
+buat("UICorner", {CornerRadius = UDim.new(0, 8)}, labelPenuh)
+buat("UIStroke", {Color = Color3.fromRGB(212, 175, 55), Thickness = 1}, labelPenuh)
+
+local function aturPosisiHud()
+	local inset = GuiService:GetTopbarInsets()
+	pil.Position = UDim2.new(0.5, 0, 0, inset.Top + 8)
+end
+aturPosisiHud()
+GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(aturPosisiHud)
+
+local tokenPenuh = 0
+pil.Activated:Connect(function()
+	tokenPenuh += 1
+	local token = tokenPenuh
+	labelPenuh.Text = GameConfig.FormatAngkaPenuh(keadaan.Micda) .. " Micda"
+	labelPenuh.Visible = true
+	task.delay(3, function()
+		if tokenPenuh == token then
+			labelPenuh.Visible = false
+		end
+	end)
+end)
 
 local gui = buat("ScreenGui", {Name = "TokoBenihGui", ResetOnSpawn = false, DisplayOrder = 5}, playerGui)
 
@@ -52,18 +146,18 @@ local judul = buat("TextLabel", {
 	TextXAlignment = Enum.TextXAlignment.Left,
 }, root)
 
-local labelKoin = buat("TextLabel", {
-	Text = "Koin: 0",
+local labelMicda = buat("TextLabel", {
+	Text = "Micda: 0",
 	AnchorPoint = Vector2.new(1, 0),
 	Position = UDim2.new(1, -56, 0, 10),
-	Size = UDim2.new(0, 150, 0, 30),
+	Size = UDim2.new(0, 170, 0, 30),
 	BackgroundColor3 = Color3.fromRGB(46, 52, 42),
 	TextColor3 = Color3.fromRGB(255, 214, 120),
 	TextScaled = true,
 	Font = Enum.Font.GothamBold,
 	BorderSizePixel = 0,
 }, root)
-buat("UICorner", {CornerRadius = UDim.new(0, 8)}, labelKoin)
+buat("UICorner", {CornerRadius = UDim.new(0, 8)}, labelMicda)
 
 local tombolTutup = buat("TextButton", {
 	Text = "X",
@@ -221,8 +315,9 @@ local function tampilBanner(teks)
 	end)
 end
 
-local function perbaruiKoin()
-	labelKoin.Text = "Koin: " .. tostring(keadaan.Koin)
+local function perbaruiMicda()
+	labelMicda.Text = "Micda: " .. GameConfig.FormatMicda(keadaan.Micda)
+	labelPil.Text = GameConfig.FormatMicda(keadaan.Micda)
 end
 
 local function bersihkan(induk)
@@ -239,7 +334,7 @@ local function buatKartu(benih)
 	local swatch = buat("Frame", {Size = UDim2.new(0, 26, 0, 26), Position = UDim2.new(0.5, -13, 0, 8), BackgroundColor3 = benih.Warna, BorderSizePixel = 0}, kartu)
 	buat("UICorner", {CornerRadius = UDim.new(1, 0)}, swatch)
 	buat("TextLabel", {Text = benih.Nama, Position = UDim2.new(0, 6, 0, 38), Size = UDim2.new(1, -12, 0, 36), BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(240, 236, 220), TextScaled = true, TextWrapped = true, Font = Enum.Font.GothamBold}, kartu)
-	buat("TextLabel", {Text = "Harga: " .. benih.Harga .. " Koin", Position = UDim2.new(0, 6, 0, 74), Size = UDim2.new(1, -12, 0, 16), BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(255, 214, 120), TextScaled = true, Font = Enum.Font.Gotham}, kartu)
+	buat("TextLabel", {Text = "Harga: " .. benih.Harga .. " " .. GameConfig.MataUang, Position = UDim2.new(0, 6, 0, 74), Size = UDim2.new(1, -12, 0, 16), BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(255, 214, 120), TextScaled = true, Font = Enum.Font.Gotham}, kartu)
 	buat("TextLabel", {Text = "Tumbuh: " .. benih.WaktuTumbuh .. " detik", Position = UDim2.new(0, 6, 0, 90), Size = UDim2.new(1, -12, 0, 16), BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(190, 196, 184), TextScaled = true, Font = Enum.Font.Gotham}, kartu)
 	local tombol = buat("TextButton", {Text = "BELI BENIH", Position = UDim2.new(0, 10, 0, 108), Size = UDim2.new(1, -20, 0, 24), BackgroundColor3 = Color3.fromRGB(64, 128, 66), TextColor3 = Color3.fromRGB(255, 255, 255), TextScaled = true, Font = Enum.Font.GothamBold, BorderSizePixel = 0}, kartu)
 	buat("UICorner", {CornerRadius = UDim.new(0, 8)}, tombol)
@@ -400,9 +495,9 @@ Remotes.InfoDataran.OnClientEvent:Connect(function(paket)
 	end
 	local jenis = paket.Jenis
 	if jenis == "Data" then
-		keadaan.Koin = tonumber(paket.Koin) or keadaan.Koin
+		keadaan.Micda = tonumber(paket.Micda) or keadaan.Micda
 		keadaan.Tas = type(paket.Tas) == "table" and paket.Tas or keadaan.Tas
-		perbaruiKoin()
+		perbaruiMicda()
 		if tabAktif == "Tas" then
 			renderTas()
 		end
@@ -425,12 +520,12 @@ task.spawn(function()
 		return Remotes.AmbilData:InvokeServer()
 	end)
 	if ok and type(data) == "table" then
-		keadaan.Koin = tonumber(data.Koin) or keadaan.Koin
+		keadaan.Micda = tonumber(data.Micda) or keadaan.Micda
 		keadaan.Tas = type(data.Tas) == "table" and data.Tas or keadaan.Tas
-		perbaruiKoin()
+		perbaruiMicda()
 	end
 end)
 
 renderKategori()
 renderToko()
-perbaruiKoin()
+perbaruiMicda()

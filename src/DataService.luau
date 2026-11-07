@@ -15,7 +15,7 @@ pcall(function()
 end)
 
 local function dataBaru()
-	return {Koin = GameConfig.KoinAwal, Tas = {}}
+	return {Micda = GameConfig.MicdaAwal, Tas = {}}
 end
 
 local function kunciItem(jenis, id)
@@ -32,14 +32,17 @@ local function muatData(player)
 			return store:GetAsync("P_" .. player.UserId)
 		end)
 		if ok and type(hasil) == "table" then
-			data.Koin = tonumber(hasil.Koin) or data.Koin
+			data.Micda = tonumber(hasil.Micda) or data.Micda
 			if type(hasil.Tas) == "table" then
 				data.Tas = hasil.Tas
 			end
 		end
 	end
+	if data.Micda > GameConfig.MicdaMaks then
+		data.Micda = GameConfig.MicdaMaks
+	end
 	dataPemain[player.UserId] = data
-	Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Selamat datang di Dataran!"})
+	Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Selamat datang di Dataran! " .. GameConfig.FormatMicda(data.Micda) .. " Micda sudah terisi di akunmu."})
 	DataService.KirimData(player)
 end
 
@@ -62,21 +65,36 @@ end
 function DataService.KirimData(player)
 	local data = dataPemain[player.UserId]
 	if data then
-		Remotes.InfoDataran:FireClient(player, {Jenis = "Data", Koin = data.Koin, Tas = data.Tas})
+		Remotes.InfoDataran:FireClient(player, {Jenis = "Data", Micda = data.Micda, Tas = data.Tas})
 	end
 end
 
-function DataService.UbahKoin(player, delta)
+function DataService.UbahMicda(player, delta)
 	local data = dataPemain[player.UserId]
 	if not data then
 		return false
 	end
-	local hasil = data.Koin + delta
+	local hasil = data.Micda + delta
 	if hasil < 0 then
 		return false
 	end
-	data.Koin = hasil
+	if hasil > GameConfig.MicdaMaks then
+		hasil = GameConfig.MicdaMaks
+	end
+	data.Micda = hasil
 	return true
+end
+
+function DataService.HadiahBicara(player, jumlah)
+	if not jumlah or jumlah <= 0 then
+		return 0
+	end
+	if jumlah > GameConfig.HadiahBicaraMaks then
+		jumlah = GameConfig.HadiahBicaraMaks
+	end
+	DataService.UbahMicda(player, jumlah)
+	DataService.KirimData(player)
+	return jumlah
 end
 
 function DataService.TambahItem(player, jenis, id, jumlah)
@@ -125,7 +143,7 @@ Remotes.AmbilData.OnServerInvoke = function(player)
 	if not data then
 		return nil
 	end
-	return {Koin = data.Koin, Tas = data.Tas}
+	return {Micda = data.Micda, Tas = data.Tas}
 end
 
 Players.PlayerAdded:Connect(muatData)

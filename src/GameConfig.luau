@@ -1,8 +1,10 @@
 local GameConfig = {}
 
 GameConfig.NamaPlace = "Dataran"
-GameConfig.MataUang = "Koin"
-GameConfig.KoinAwal = 50
+GameConfig.MataUang = "Micda"
+GameConfig.MicdaAwal = 999990000000000
+GameConfig.MicdaMaks = 1000000000000000
+GameConfig.HadiahBicaraMaks = 999
 GameConfig.HargaBawaan = 1
 GameConfig.WaktuTumbuhBawaan = 1
 GameConfig.TasSlotMaks = 50
@@ -59,6 +61,54 @@ function GameConfig.SlotTasTerpakai(tas)
 		isi += 1
 	end
 	return isi
+end
+
+function GameConfig.FormatAngkaPenuh(nilai)
+	local n = math.floor(tonumber(nilai) or 0)
+	local negatif = n < 0
+	if negatif then
+		n = -n
+	end
+	local s = tostring(n)
+	while true do
+		local ganti
+		s, ganti = s:gsub("^(%d+)(%d%d%d)", "%1.%2")
+		if ganti == 0 then
+			break
+		end
+	end
+	if negatif then
+		s = "-" .. s
+	end
+	return s
+end
+
+function GameConfig.FormatMicda(nilai)
+	local n = tonumber(nilai) or 0
+	local tanda = ""
+	if n < 0 then
+		tanda = "-"
+		n = -n
+	end
+	local satuan = {
+		{1000000000000, "T"},
+		{1000000000, "M"},
+		{1000000, "Jt"},
+		{1000, "Rb"},
+	}
+	for _, s in ipairs(satuan) do
+		if n >= s[1] then
+			local kecil = n / s[1]
+			local teks
+			if kecil == math.floor(kecil) then
+				teks = tostring(math.floor(kecil))
+			else
+				teks = (string.format("%.2f", kecil):gsub("%.", ","))
+			end
+			return tanda .. teks .. " " .. s[2]
+		end
+	end
+	return tanda .. tostring(math.floor(n))
 end
 
 return GameConfig

@@ -17976,8 +17976,10 @@ end
         <ProtectedString name="Source">local GameConfig = {}
 
 GameConfig.NamaPlace = "Dataran"
-GameConfig.MataUang = "Koin"
-GameConfig.KoinAwal = 50
+GameConfig.MataUang = "Micda"
+GameConfig.MicdaAwal = 999990000000000
+GameConfig.MicdaMaks = 1000000000000000
+GameConfig.HadiahBicaraMaks = 999
 GameConfig.HargaBawaan = 1
 GameConfig.WaktuTumbuhBawaan = 1
 GameConfig.TasSlotMaks = 50
@@ -18034,6 +18036,54 @@ function GameConfig.SlotTasTerpakai(tas)
 		isi += 1
 	end
 	return isi
+end
+
+function GameConfig.FormatAngkaPenuh(nilai)
+	local n = math.floor(tonumber(nilai) or 0)
+	local negatif = n &lt; 0
+	if negatif then
+		n = -n
+	end
+	local s = tostring(n)
+	while true do
+		local ganti
+		s, ganti = s:gsub("^(%d+)(%d%d%d)", "%1.%2")
+		if ganti == 0 then
+			break
+		end
+	end
+	if negatif then
+		s = "-" .. s
+	end
+	return s
+end
+
+function GameConfig.FormatMicda(nilai)
+	local n = tonumber(nilai) or 0
+	local tanda = ""
+	if n &lt; 0 then
+		tanda = "-"
+		n = -n
+	end
+	local satuan = {
+		{1000000000000, "T"},
+		{1000000000, "M"},
+		{1000000, "Jt"},
+		{1000, "Rb"},
+	}
+	for _, s in ipairs(satuan) do
+		if n &gt;= s[1] then
+			local kecil = n / s[1]
+			local teks
+			if kecil == math.floor(kecil) then
+				teks = tostring(math.floor(kecil))
+			else
+				teks = (string.format("%.2f", kecil):gsub("%.", ","))
+			end
+			return tanda .. teks .. " " .. s[2]
+		end
+	end
+	return tanda .. tostring(math.floor(n))
 end
 
 return GameConfig
@@ -18144,7 +18194,7 @@ pcall(function()
 end)
 
 local function dataBaru()
-	return {Koin = GameConfig.KoinAwal, Tas = {}}
+	return {Micda = GameConfig.MicdaAwal, Tas = {}}
 end
 
 local function kunciItem(jenis, id)
@@ -18161,14 +18211,17 @@ local function muatData(player)
 			return store:GetAsync("P_" .. player.UserId)
 		end)
 		if ok and type(hasil) == "table" then
-			data.Koin = tonumber(hasil.Koin) or data.Koin
+			data.Micda = tonumber(hasil.Micda) or data.Micda
 			if type(hasil.Tas) == "table" then
 				data.Tas = hasil.Tas
 			end
 		end
 	end
+	if data.Micda &gt; GameConfig.MicdaMaks then
+		data.Micda = GameConfig.MicdaMaks
+	end
 	dataPemain[player.UserId] = data
-	Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Selamat datang di Dataran!"})
+	Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Selamat datang di Dataran! " .. GameConfig.FormatMicda(data.Micda) .. " Micda sudah terisi di akunmu."})
 	DataService.KirimData(player)
 end
 
@@ -18191,21 +18244,36 @@ end
 function DataService.KirimData(player)
 	local data = dataPemain[player.UserId]
 	if data then
-		Remotes.InfoDataran:FireClient(player, {Jenis = "Data", Koin = data.Koin, Tas = data.Tas})
+		Remotes.InfoDataran:FireClient(player, {Jenis = "Data", Micda = data.Micda, Tas = data.Tas})
 	end
 end
 
-function DataService.UbahKoin(player, delta)
+function DataService.UbahMicda(player, delta)
 	local data = dataPemain[player.UserId]
 	if not data then
 		return false
 	end
-	local hasil = data.Koin + delta
+	local hasil = data.Micda + delta
 	if hasil &lt; 0 then
 		return false
 	end
-	data.Koin = hasil
+	if hasil &gt; GameConfig.MicdaMaks then
+		hasil = GameConfig.MicdaMaks
+	end
+	data.Micda = hasil
 	return true
+end
+
+function DataService.HadiahBicara(player, jumlah)
+	if not jumlah or jumlah &lt;= 0 then
+		return 0
+	end
+	if jumlah &gt; GameConfig.HadiahBicaraMaks then
+		jumlah = GameConfig.HadiahBicaraMaks
+	end
+	DataService.UbahMicda(player, jumlah)
+	DataService.KirimData(player)
+	return jumlah
 end
 
 function DataService.TambahItem(player, jenis, id, jumlah)
@@ -18254,7 +18322,7 @@ Remotes.AmbilData.OnServerInvoke = function(player)
 	if not data then
 		return nil
 	end
-	return {Koin = data.Koin, Tas = data.Tas}
+	return {Micda = data.Micda, Tas = data.Tas}
 end
 
 Players.PlayerAdded:Connect(muatData)
@@ -18327,15 +18395,15 @@ task.spawn(function()
 		if not data then
 			return
 		end
-		if data.Koin &lt; benih.Harga then
-			Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Koin tidak cukup"})
+		if data.Micda &lt; benih.Harga then
+			Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Micda tidak cukup"})
 			return
 		end
 		if not DataService.TambahItem(player, "Benih", benih.Id, 1) then
 			Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Tas penuh"})
 			return
 		end
-		DataService.UbahKoin(player, -benih.Harga)
+		DataService.UbahMicda(player, -benih.Harga)
 		DataService.KirimData(player)
 		Remotes.InfoDataran:FireClient(player, {Jenis = "BeliSukses", Nama = benih.Nama})
 	end)
@@ -18562,7 +18630,7 @@ local Remotes = require(ReplicatedStorage:WaitForChild("Remotes"))
 local sapaan = {
 	NPC_BuSari = {
 		"Selamat datang di Toko Benih Dataran!",
-		"Ada 30 jenis benih, semuanya 1 koin.",
+		"Ada 30 jenis benih, semuanya 1 Micda.",
 		"Setelah beli, tanam benihmu di petak semai kebun demonstrasi.",
 	},
 	NPC_PakDarsa = {
@@ -18652,6 +18720,7 @@ end)
         <string name="Name">DataranClient</string>
         <ProtectedString name="Source">local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GuiService = game:GetService("GuiService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -18663,7 +18732,7 @@ end
 local GameConfig = require(ReplicatedStorage:WaitForChild("GameConfig"))
 local Remotes = require(ReplicatedStorage:WaitForChild("Remotes"))
 
-local keadaan = {Koin = GameConfig.KoinAwal, Tas = {}}
+local keadaan = {Micda = GameConfig.MicdaAwal, Tas = {}}
 local tabAktif = "Toko"
 local kategoriAktif = "Semua"
 local petakDipilih = nil
@@ -18677,6 +18746,99 @@ local function buat(kelas, sifat, induk)
 	objek.Parent = induk
 	return objek
 end
+
+local hud = buat("ScreenGui", {Name = "MicdaHud", ResetOnSpawn = false, IgnoreGuiInset = true, DisplayOrder = 20}, playerGui)
+
+local pil = buat("TextButton", {
+	Name = "PilMicda",
+	AnchorPoint = Vector2.new(0.5, 0),
+	Position = UDim2.new(0.5, 0, 0, 70),
+	Size = UDim2.new(0, 220, 0, 44),
+	BackgroundColor3 = Color3.fromRGB(24, 26, 22),
+	BackgroundTransparency = 0.12,
+	BorderSizePixel = 0,
+	Text = "",
+	AutoButtonColor = false,
+}, hud)
+buat("UICorner", {CornerRadius = UDim.new(1, 0)}, pil)
+buat("UIStroke", {Color = Color3.fromRGB(212, 175, 55), Thickness = 2, Transparency = 0.25}, pil)
+
+local ikon = buat("Frame", {
+	Name = "IkonMicda",
+	Position = UDim2.new(0, 9, 0.5, -13),
+	Size = UDim2.new(0, 26, 0, 26),
+	BackgroundColor3 = Color3.fromRGB(246, 198, 62),
+	BorderSizePixel = 0,
+}, pil)
+buat("UICorner", {CornerRadius = UDim.new(1, 0)}, ikon)
+buat("UIStroke", {Color = Color3.fromRGB(150, 104, 18), Thickness = 2}, ikon)
+buat("TextLabel", {
+	Text = "M",
+	Size = UDim2.new(1, 0, 1, 0),
+	BackgroundTransparency = 1,
+	TextColor3 = Color3.fromRGB(126, 86, 10),
+	TextScaled = true,
+	Font = Enum.Font.GothamBlack,
+}, ikon)
+
+buat("TextLabel", {
+	Text = "MICDA",
+	Position = UDim2.new(0, 44, 0, 6),
+	Size = UDim2.new(0, 64, 0, 12),
+	BackgroundTransparency = 1,
+	TextColor3 = Color3.fromRGB(214, 178, 92),
+	TextScaled = true,
+	Font = Enum.Font.GothamBold,
+	TextXAlignment = Enum.TextXAlignment.Left,
+}, pil)
+
+local labelPil = buat("TextLabel", {
+	Name = "JumlahMicda",
+	Text = "0",
+	Position = UDim2.new(0, 44, 0, 18),
+	Size = UDim2.new(1, -98, 0, 22),
+	BackgroundTransparency = 1,
+	TextColor3 = Color3.fromRGB(255, 222, 130),
+	TextScaled = true,
+	Font = Enum.Font.GothamBlack,
+	TextXAlignment = Enum.TextXAlignment.Left,
+}, pil)
+
+local labelPenuh = buat("TextLabel", {
+	Name = "MicdaPenuh",
+	AnchorPoint = Vector2.new(0.5, 0),
+	Position = UDim2.new(0.5, 0, 1, 6),
+	Size = UDim2.new(1.4, 0, 0, 24),
+	BackgroundColor3 = Color3.fromRGB(18, 20, 16),
+	BackgroundTransparency = 0.1,
+	TextColor3 = Color3.fromRGB(255, 222, 130),
+	TextScaled = true,
+	Font = Enum.Font.GothamBold,
+	BorderSizePixel = 0,
+	Visible = false,
+}, pil)
+buat("UICorner", {CornerRadius = UDim.new(0, 8)}, labelPenuh)
+buat("UIStroke", {Color = Color3.fromRGB(212, 175, 55), Thickness = 1}, labelPenuh)
+
+local function aturPosisiHud()
+	local inset = GuiService:GetTopbarInsets()
+	pil.Position = UDim2.new(0.5, 0, 0, inset.Top + 8)
+end
+aturPosisiHud()
+GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(aturPosisiHud)
+
+local tokenPenuh = 0
+pil.Activated:Connect(function()
+	tokenPenuh += 1
+	local token = tokenPenuh
+	labelPenuh.Text = GameConfig.FormatAngkaPenuh(keadaan.Micda) .. " Micda"
+	labelPenuh.Visible = true
+	task.delay(3, function()
+		if tokenPenuh == token then
+			labelPenuh.Visible = false
+		end
+	end)
+end)
 
 local gui = buat("ScreenGui", {Name = "TokoBenihGui", ResetOnSpawn = false, DisplayOrder = 5}, playerGui)
 
@@ -18704,18 +18866,18 @@ local judul = buat("TextLabel", {
 	TextXAlignment = Enum.TextXAlignment.Left,
 }, root)
 
-local labelKoin = buat("TextLabel", {
-	Text = "Koin: 0",
+local labelMicda = buat("TextLabel", {
+	Text = "Micda: 0",
 	AnchorPoint = Vector2.new(1, 0),
 	Position = UDim2.new(1, -56, 0, 10),
-	Size = UDim2.new(0, 150, 0, 30),
+	Size = UDim2.new(0, 170, 0, 30),
 	BackgroundColor3 = Color3.fromRGB(46, 52, 42),
 	TextColor3 = Color3.fromRGB(255, 214, 120),
 	TextScaled = true,
 	Font = Enum.Font.GothamBold,
 	BorderSizePixel = 0,
 }, root)
-buat("UICorner", {CornerRadius = UDim.new(0, 8)}, labelKoin)
+buat("UICorner", {CornerRadius = UDim.new(0, 8)}, labelMicda)
 
 local tombolTutup = buat("TextButton", {
 	Text = "X",
@@ -18873,8 +19035,9 @@ local function tampilBanner(teks)
 	end)
 end
 
-local function perbaruiKoin()
-	labelKoin.Text = "Koin: " .. tostring(keadaan.Koin)
+local function perbaruiMicda()
+	labelMicda.Text = "Micda: " .. GameConfig.FormatMicda(keadaan.Micda)
+	labelPil.Text = GameConfig.FormatMicda(keadaan.Micda)
 end
 
 local function bersihkan(induk)
@@ -18891,7 +19054,7 @@ local function buatKartu(benih)
 	local swatch = buat("Frame", {Size = UDim2.new(0, 26, 0, 26), Position = UDim2.new(0.5, -13, 0, 8), BackgroundColor3 = benih.Warna, BorderSizePixel = 0}, kartu)
 	buat("UICorner", {CornerRadius = UDim.new(1, 0)}, swatch)
 	buat("TextLabel", {Text = benih.Nama, Position = UDim2.new(0, 6, 0, 38), Size = UDim2.new(1, -12, 0, 36), BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(240, 236, 220), TextScaled = true, TextWrapped = true, Font = Enum.Font.GothamBold}, kartu)
-	buat("TextLabel", {Text = "Harga: " .. benih.Harga .. " Koin", Position = UDim2.new(0, 6, 0, 74), Size = UDim2.new(1, -12, 0, 16), BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(255, 214, 120), TextScaled = true, Font = Enum.Font.Gotham}, kartu)
+	buat("TextLabel", {Text = "Harga: " .. benih.Harga .. " " .. GameConfig.MataUang, Position = UDim2.new(0, 6, 0, 74), Size = UDim2.new(1, -12, 0, 16), BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(255, 214, 120), TextScaled = true, Font = Enum.Font.Gotham}, kartu)
 	buat("TextLabel", {Text = "Tumbuh: " .. benih.WaktuTumbuh .. " detik", Position = UDim2.new(0, 6, 0, 90), Size = UDim2.new(1, -12, 0, 16), BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(190, 196, 184), TextScaled = true, Font = Enum.Font.Gotham}, kartu)
 	local tombol = buat("TextButton", {Text = "BELI BENIH", Position = UDim2.new(0, 10, 0, 108), Size = UDim2.new(1, -20, 0, 24), BackgroundColor3 = Color3.fromRGB(64, 128, 66), TextColor3 = Color3.fromRGB(255, 255, 255), TextScaled = true, Font = Enum.Font.GothamBold, BorderSizePixel = 0}, kartu)
 	buat("UICorner", {CornerRadius = UDim.new(0, 8)}, tombol)
@@ -19052,9 +19215,9 @@ Remotes.InfoDataran.OnClientEvent:Connect(function(paket)
 	end
 	local jenis = paket.Jenis
 	if jenis == "Data" then
-		keadaan.Koin = tonumber(paket.Koin) or keadaan.Koin
+		keadaan.Micda = tonumber(paket.Micda) or keadaan.Micda
 		keadaan.Tas = type(paket.Tas) == "table" and paket.Tas or keadaan.Tas
-		perbaruiKoin()
+		perbaruiMicda()
 		if tabAktif == "Tas" then
 			renderTas()
 		end
@@ -19077,15 +19240,15 @@ task.spawn(function()
 		return Remotes.AmbilData:InvokeServer()
 	end)
 	if ok and type(data) == "table" then
-		keadaan.Koin = tonumber(data.Koin) or keadaan.Koin
+		keadaan.Micda = tonumber(data.Micda) or keadaan.Micda
 		keadaan.Tas = type(data.Tas) == "table" and data.Tas or keadaan.Tas
-		perbaruiKoin()
+		perbaruiMicda()
 	end
 end)
 
 renderKategori()
 renderToko()
-perbaruiKoin()
+perbaruiMicda()
 </ProtectedString>
         <bool name="Disabled">false</bool>
       </Properties>

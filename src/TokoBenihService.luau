@@ -35,15 +35,15 @@ task.spawn(function()
 		if not data then
 			return
 		end
-		if data.Koin < benih.Harga then
-			Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Koin tidak cukup"})
+		if data.Micda < benih.Harga then
+			Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Micda tidak cukup"})
 			return
 		end
 		if not DataService.TambahItem(player, "Benih", benih.Id, 1) then
 			Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Tas penuh"})
 			return
 		end
-		DataService.UbahKoin(player, -benih.Harga)
+		DataService.UbahMicda(player, -benih.Harga)
 		DataService.KirimData(player)
 		Remotes.InfoDataran:FireClient(player, {Jenis = "BeliSukses", Nama = benih.Nama})
 	end)

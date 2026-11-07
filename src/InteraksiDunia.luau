@@ -5,7 +5,7 @@ local Remotes = require(ReplicatedStorage:WaitForChild("Remotes"))
 local sapaan = {
 	NPC_BuSari = {
 		"Selamat datang di Toko Benih Dataran!",
-		"Ada 30 jenis benih, semuanya 1 koin.",
+		"Ada 30 jenis benih, semuanya 1 Micda.",
 		"Setelah beli, tanam benihmu di petak semai kebun demonstrasi.",
 	},
 	NPC_PakDarsa = {
