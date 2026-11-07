@@ -2,13 +2,15 @@
 # CADANGAN GITHUB DUNIA AKIOMIDA — SATU TARGET LANGSUNG
 # Dipanggil di akhir SETIAP sesi update (wajib). Commit semua perubahan
 # proyek dan push langsung ke branch "dunia-akiomida" di
-# github.com/familygoldenmekkah-hub/Ciumbulet. Tidak ada repo lain.
+# github.com/akiomida/Io (repo milik pemilik; token akiomida punya akses).
+# Riwayat: sebelumnya target familygoldenmekkah-hub/Ciumbulet, ditolak 403
+# oleh token akiomida (7 Nov 2026) sehingga target dipindah ke sini.
 # Kredensial dibaca dari .secrets (tidak pernah dicetak/disimpan lain).
 set -uo pipefail
-set -a; source /home/z/my-project/.secrets/ciumbulet.env; set +a
+set -a; source /tmp/my-project/.secrets/akiomida.env; set +a
 REPO_DIR=/home/z/my-project/download/dunia-akiomida
 BRANCH=dunia-akiomida
-REMOTE=https://github.com/familygoldenmekkah-hub/Ciumbulet.git
+REMOTE=https://github.com/akiomida/Io.git
 VER=$(grep -oE 'versionNumber [0-9]+' "$REPO_DIR/README.md" | head -1 | grep -oE '[0-9]+$')
 cd "$REPO_DIR" || exit 1
 mkdir -p harness/sim
@@ -19,7 +21,7 @@ if ! git diff --cached --quiet; then
     git commit -m "v${VER:-?} — snapshot otomatis sesi update (riwayat lengkap: README.md tabel versi + RUBRIC.md skor)" | tail -1
 fi
 N=$(git rev-list --count origin/"${BRANCH}"..main 2>/dev/null || echo "?")
-if git push "https://x-access-token:${GITHUB_TOKEN_CIUM}@github.com/familygoldenmekkah-hub/Ciumbulet.git" main:${BRANCH} 2>&1 | tail -2; then
+if git push "https://x-access-token:${GITHUB_TOKEN}@github.com/akiomida/Io.git" main:${BRANCH} 2>&1 | tail -2; then
     echo "[CADANGAN] Terpush: ${REMOTE} branch ${BRANCH} (v${VER:-?}, ${N} commit)"
 else
     echo "[CADANGAN][PERINGATAN] Push gagal (mungkin history berubah). Cek manual."
