@@ -113,10 +113,8 @@ def kena_sungai(x, z, r):
 
 
 def bebas(x, z, r, di_jalan=False):
-    """Lolos semua larangan: alun-alun, jalan, sungai, bangunan, objek terpakai.
+    """Lolos semua larangan: padang, jalan, sungai, bangunan, objek terpakai.
     di_jalan=True untuk furnitur yang memang sengaja berdiri di atas pelataran/jalan."""
-    if math.hypot(x, z) < 25.5 + r and not di_jalan:
-        return False
     if abs(x) > 470 or abs(z) > 470:
         return False
     if not di_jalan and (kena_jalan(x, z, r) or kena_sungai(x, z, r)):
@@ -203,7 +201,7 @@ def jalan(items, nama, x0, z0, x1, z1, lebar, warna, mat, tebal=0.5, y=0.0):
         return
     yaw = math.degrees(math.atan2(x1 - x0, z1 - z0))
     cx, cz = (x0 + x1) / 2.0, (z0 + z1) / 2.0
-    p = part(nama, (cx, y, cz), (tebal, lebar, panj), warna, mat)
+    p = part(nama, (cx, y, cz), (lebar, tebal, panj), warna, mat)
     p.props[8] = p_cframe("CFrame", (cx, y, cz), rot_matrix(yaw))
     items.append(p)
     ROADS.append((x0, z0, x1, z1, lebar / 2.0))
@@ -237,18 +235,20 @@ def build_jalan():
     items = []
     for arah in ("barat", "timur", "utara", "selatan"):
         boulevard(items, arah)
-    jalan(items, "JalanToko", -22, -12, -64, -44, 14, PAL["tanah"], M["ground"])
-    jalan(items, "JalanKebun", 23, -9, 50, -6, 14, PAL["tanah"], M["ground"])
-    jalan(items, "JalanDesaA", 19, -19, 52, -62, 14, PAL["tanah"], M["ground"])
+    jalan(items, "SumbuBarat", -24, 0, -9, 0, 16, PAL["cobble"], M["cobble"])
+    jalan(items, "SumbuTimur", 9, 0, 24, 0, 16, PAL["cobble"], M["cobble"])
+    jalan(items, "JalanToko", -30, -18, -58, -46, 8, PAL["tanah"], M["ground"])
+    jalan(items, "JalanKebun", 30, -10, 52, -6, 8, PAL["tanah"], M["ground"])
+    jalan(items, "JalanDesaA", 21, -22, 52, -62, 10, PAL["tanah"], M["ground"])
     jalan(items, "JalanDesaB", 52, -62, 112, -62, 14, PAL["tanah"], M["ground"])
-    jalan(items, "JalanSungai", 17, 17, 57, 155, 14, PAL["tanah"], M["ground"])
+    jalan(items, "JalanSungai", 18.4, 22, 57, 155, 14, PAL["tanah"], M["ground"])
     jalan(items, "LokalGudang", 112, -62, 138, -50, 6, PAL["tanah_muda"], M["ground"])
     return items
 
 
 def build_jembatan():
     items = []
-    items.append(part("DekJembatan", (0, 0.9, 190), (1.2, 24, 36), PAL["kayu_muda"], M["planks"]))
+    items.append(part("DekJembatan", (0, 0.9, 190), (24, 1.2, 36), PAL["kayu_muda"], M["planks"]))
     for sx in (-1, 1):
         items.append(part("RelJembatan", (sx * 11.4, 2.7, 190), (1.6, 0.8, 36), PAL["kayu"], M["wood"]))
         for sz in (174, 190, 206):
@@ -462,44 +462,85 @@ def arah_ke_sungai(px, pz):
 
 # ---------- alun-alun ----------
 
-def build_plaza():
+def build_padang():
+    """Padang civic formal — prinsip dari dataran-dataran kota dunia (padang hijau
+    persegi dikepung tepi terbangun, satu sumbu, landmark menara di tepi, ritme
+    struktur berulang yang menembus cahaya). Bentuk 100% original, tanpa bendera
+    dan tanpa simbol negara apa pun."""
     items = []
-    items.append(part("DasarAlunAlun", (0, 0.0, 0), (0.7, 52, 52), PAL["cobble_gelap"], M["cobble"], "cylinder", 0, True, 0, 0, 90))
-    items.append(part("LantaiAlunAlun", (0, 0.0, 0), (1.0, 48, 48), PAL["cobble"], M["cobble"], "cylinder", 0, True, 0, 0, 90))
+    RECTS.append((-30, -22, 30, 22))
+    items.append(part("PadangBaratS", (-21, 0.0, -15), (18, 0.6, 14), PAL["rumput"], M["grass"]))
+    items.append(part("PadangBaratU", (-21, 0.0, 15), (18, 0.6, 14), PAL["rumput"], M["grass"]))
+    items.append(part("PadangTimurS", (21, 0.0, -15), (18, 0.6, 14), PAL["rumput"], M["grass"]))
+    items.append(part("PadangTimurU", (21, 0.0, 15), (18, 0.6, 14), PAL["rumput"], M["grass"]))
+    items.append(part("PadangTengahS", (0, 0.0, -15), (24, 0.6, 14), PAL["rumput"], M["grass"]))
+    items.append(part("PadangTengahU", (0, 0.0, 15), (24, 0.6, 14), PAL["rumput"], M["grass"]))
+    kolom = [(-30, -12), (-30, 12), (-30, 16.75), (-30, 21.5),
+             (30, -21.5), (30, -17), (30, 12), (30, 16.75), (30, 21.5)]
+    for (kx, kz) in kolom:
+        if tempat(kx, kz, 1.2):
+            items.append(part("KolomPadang", (kx, 3.4, kz), (1.2, 6.8, 1.2), PAL["batu"], M["slate"]))
+    for (lx, lz, ll) in ((-30, 16.75, 10.5), (30, 16.75, 10.5), (30, -19.25, 5.5)):
+        items.append(part("LintelPadang", (lx, 7.4, lz), (0.9, 1.2, ll + 1), PAL["kayu_muda"], M["planks"]))
+    items.append(part("PagarHidupUtara", (0, 1.1, -22), (60, 2.2, 1.2), PAL["daun_tua"], M["grass"]))
+    items.append(part("PagarHidupSelatan", (-9.5, 1.1, 22), (41, 2.2, 1.2), PAL["daun_tua"], M["grass"]))
+    RECTS.append((-30, -22.6, 30, -21.4))
+    RECTS.append((-30, 21.4, 11, 22.6))
     items.append(part("MancurBak", (0, 1.9, 0), (2.6, 18, 18), PAL["batu"], M["slate"], "cylinder", 0, True, 0, 0, 90))
     items.append(part("MancurAir", (0, 2.0, 0), (2.0, 14.6, 14.6), PAL["air"], M["water"], "cylinder", 0.25, False, 0, 0, 90))
     items.append(part("MancurTiang", (0, 5.2, 0), (4.4, 2.2, 2.2), PAL["batu"], M["slate"], "cylinder", 0, True, 0, 0, 90))
     items.append(part("MancurMangkuk", (0, 7.6, 0), (0.9, 5.2, 5.2), PAL["batu"], M["slate"], "cylinder", 0, True, 0, 0, 90))
     items.append(part("MancurBola", (0, 8.8, 0), (1.8, 1.8, 1.8), PAL["batu"], M["granite"], "ball"))
     tempat(0, 0, 10)
-
-    bunga_warna = [(206, 194, 160), (196, 182, 148), (178, 182, 198), (188, 170, 130)]
-    for i in range(10):
-        a = math.radians(i * 36 + 18)
-        fx, fz = 12 * math.cos(a), 12 * math.sin(a)
-        if tempat(fx, fz, 0.9):
-            items.append(bunga_at(fx, fz, bunga_warna[i % 4]))
-
+    putih = (230, 228, 222)
+    for i in (45, 90, 135, 225, 270, 315):
+        rad = math.radians(i)
+        rx, rz = 14 * math.cos(rad), 14 * math.sin(rad)
+        if tempat(rx, rz, 1.3):
+            items.append(part("RusukPaviliun", (rx, 6.5, rz), (1.1, 13, 0.9), putih, M["smooth"], "block", 0, True, i))
+    for i in (67.5, 112.5, 157.5, 202.5, 247.5, 292.5):
+        rad = math.radians(i)
+        rx, rz = 14 * math.cos(rad), 14 * math.sin(rad)
+        if tempat(rx, rz, 1.2):
+            items.append(part("CincinPaviliun", (rx, 13.6, rz), (12, 0.6, 0.9), putih, M["smooth"], "block", 0, True, i + 90))
+    fr = Frame(-20, -30, 180)
+    items.append(fr.part("PijakanMenara", (0, 0.6, 0), (6, 1.2, 6), PAL["batu"], M["slate"]))
+    items.append(fr.part("DasarMenara", (0, 3.5, 0), (4.5, 5, 4.5), PAL["batu_gelap"], M["slate"]))
+    items.append(fr.part("BatangMenara", (0, 15, 0), (3, 18, 3), PAL["plester"], M["smooth"]))
+    jam = fr.part("KotakJam", (0, 20, 0), (3.8, 3.2, 3.8), PAL["batu_gelap"], M["slate"])
+    add_text_surface(jam, FACE["front"], "MENARA\nDATARAN", PAL["teks_papan"])
+    add_text_surface(jam, FACE["back"], "PADANG\nCIVIC", PAL["teks_papan"])
+    items.append(jam)
+    items.append(fr.part("LisMenara", (0, 24.4, 0), (3.6, 0.8, 3.6), PAL["plester_tua"], M["smooth"]))
+    items.append(fr.part("AtapMenara1", (0, 25.9, 0), (5.4, 1, 4.2), PAL["atap"], M["brick"], "block", 0, True, 0, 30))
+    items.append(fr.part("AtapMenara2", (0, 25.9, 0), (4.2, 1, 5.4), PAL["atap"], M["brick"], "block", 0, True, 90, 30))
+    items.append(fr.part("PuncakMenara", (0, 28.6, 0), (1.4, 1.4, 1.4), PAL["batu"], M["granite"], "ball"))
+    tempat(-20, -30, 5)
     papan = []
-    papan_tanda(papan, -15, -15, 225, 
-                "PAPAN INFORMASI DATARAN\nSelamat datang di Dataran, pusat seluruh kawasan.\nToko Benih di barat - Kebun Demonstrasi di timur.\nDusun di timur laut; sungai, jembatan, dan dermaga di selatan.\nGerbang: Kampung (barat), Sabana (utara), Stepa (timur), Perladangan (selatan).",
-                lebar=16, tinggi=7, nama="PapanInfo")
+    papan_tanda(papan, -24, -14, 270,
+                "PAPAN INFORMASI PADANG DATARAN\nPadang civic terbuka di pusat Dataran.\nToko Benih lewat gerbang barat - Kebun Demonstrasi lewat gerbang timur.\nDusun di timur laut; sungai, jembatan, dan dermaga di selatan.\nGerbang kawasan: Kampung, Sabana, Stepa, Perladangan.",
+                lebar=14, tinggi=4.5, nama="PapanInfo")
     for item in papan:
         items.append(item)
-    tempat(-15, -15, 9)
-
-    for a in (22, 45, 67, 112, 157, 270, 292, 337):
+    tempat(-24, -14, 4)
+    for a in (35, 75, 105, 145, 215, 325):
         rad = math.radians(a)
         bx, bz = 19 * math.cos(rad), 19 * math.sin(rad)
-        yaw = 90 - a
         if tempat(bx, bz, 2.5):
-            items += bench_at(bx, bz, yaw)
-    for a in (0, 90, 135, 315):
+            items += bench_at(bx, bz, 90 - a)
+    for a in (30, 150, 210, 330):
         rad = math.radians(a)
-        lx, lz = 23 * math.cos(rad), 23 * math.sin(rad)
+        lx, lz = 21 * math.cos(rad), 21 * math.sin(rad)
         if tempat(lx, lz, 1.5):
             items += lampu_at(lx, lz)
-    tempat(0, 0, 25.5)
+    bunga_k = [(206, 194, 160), (196, 182, 148), (178, 182, 198), (188, 170, 130)]
+    nomor = 0
+    for (cx, cz) in ((-26, -18), (26, -18), (-26, 18), (26, 18)):
+        for (ox, oz) in ((1.5, 0), (-1.5, 0), (0, -1.5)):
+            fx, fz = cx + ox, cz + oz
+            if tempat(fx, fz, 0.8):
+                items.append(bunga_at(fx, fz, bunga_k[nomor % 4]))
+            nomor += 1
     return items
 
 
@@ -575,16 +616,16 @@ def build_toko():
     zona.add(fr.part("CounterToko", (-4, 2.9, -12), (2, 3, 12), PAL["kayu_muda"], M["planks"]))
 
     halaman = []
-    halaman.append(part("PelataranToko", (-61, 0.0, -48), (0.6, 18, 16), PAL["cobble"], M["cobble"]))
+    halaman.append(part("PelataranToko", (-61, 0.0, -48), (18, 0.6, 16), PAL["cobble"], M["cobble"]))
     RECTS.append((-70, -56, -52, -40))
     for bz in (-55.5, -40.5):
-        halaman.append(part("BedBungaToko", (-61, 0.3, bz), (0.5, 10, 3), (104, 82, 58), M["ground"]))
+        halaman.append(part("BedBungaToko", (-61, 0.3, bz), (10, 0.5, 3), (104, 82, 58), M["ground"]))
         RECTS.append((-66, bz - 1.5, -56, bz + 1.5))
         bunga_k = [(206, 194, 160), (196, 182, 148), (178, 182, 198), (188, 170, 130)]
         for i, fx in enumerate((-65, -62.3, -59.6, -57)):
             if tempat(fx, bz, 0.8):
                 halaman.append(bunga_at(fx, bz, bunga_k[i % 4]))
-    for (lx, lz) in ((-53, -54), (-53, -42)):
+    for (lx, lz) in ((-53, -54), (-67, -42)):
         if tempat(lx, lz, 1.5):
             halaman += lampu_at(lx, lz)
     if tempat(-63, -53, 2.5):
@@ -630,7 +671,7 @@ def build_village():
         RECTS.append((hx - 10, -90, hx + 10, -74))
         pagar_taman(items_all, hx, -71, hx)
         bunga_k = [(206, 194, 160), (196, 182, 148), (178, 182, 198), (188, 170, 130)]
-        for i, fx in enumerate((hx - 6, hx - 2, hx + 2, hx + 6)):
+        for i, fx in enumerate((hx - 3, hx + 3)):
             if tempat(fx, -72.5, 0.8):
                 items_all.append(bunga_at(fx, -72.5, bunga_k[i % 4]))
         lokasi = pilih([(hx, -96), (hx + 4, -98), (hx - 4, -98)], 3.2)
@@ -648,7 +689,7 @@ def build_village():
         RECTS.append((hx - 10, -46, hx + 10, -30))
         pagar_taman(items_all, hx, -53, hx)
         bunga_k = [(206, 194, 160), (196, 182, 148), (178, 182, 198), (188, 170, 130)]
-        for i, fx in enumerate((hx - 6, hx - 2, hx + 2, hx + 6)):
+        for i, fx in enumerate((hx - 3, hx + 3)):
             if tempat(fx, -49.5, 0.8):
                 items_all.append(bunga_at(fx, -49.5, bunga_k[i % 4]))
         lokasi = pilih([(hx, -22), (hx - 4, -20), (hx + 4, -20)], 3.2)
@@ -722,9 +763,9 @@ def display_plant(x, z, sid, warna, kategori):
 def build_kebun():
     kebun = folder("KebunDemo")
     for i in range(6):
-        kebun.add(part("PetakSemai%d" % (i + 1), (44, 0.45, -8 - 8 * i), (6, 0.6, 6), (96, 74, 52), M["ground"]))
-        tempat(44, -8 - 8 * i, 3.5)
-    rows = [(56, "Serealia"), (66, "Legum"), (76, "Sayuran"), (86, "Buah-buahan"), (96, "Tanaman Lainnya")]
+        kebun.add(part("PetakSemai%d" % (i + 1), (106, 0.45, -18 - 7 * i), (6, 0.6, 6), (96, 74, 52), M["ground"]))
+        tempat(106, -18 - 7 * i, 3.5)
+    rows = [(60, "Serealia"), (70, "Legum"), (80, "Sayuran"), (90, "Buah-buahan"), (100, "Tanaman Lainnya")]
     for row_x, kategori in rows:
         kebun.add(part("TiangKategori", (row_x, 3.5, -6.5), (0.8, 7, 0.8), PAL["kayu"], M["wood"]))
         board = part("PapanKategori", (row_x, 5.6, -6.5), (8, 3.4, 0.5), PAL["papan"], M["planks"])
@@ -742,14 +783,14 @@ def build_kebun():
             add_text_surface(plate, FACE["back"], nama, PAL["teks_gelap"])
             kebun.add(plate)
     gerbang_kebun = []
-    for pz in (2, -10):
+    for pz in (3.5, -14.5):
         gerbang_kebun.append(part("TiangGerbangKebun", (52, 4.5, pz), (0.9, 9, 0.9), PAL["kayu"], M["wood"], "cylinder", 0, True, 0, 0, 90))
         gerbang_kebun.append(part("KakiGerbangKebun", (52, 0.6, pz), (1.8, 1.2, 1.8), PAL["batu"], M["slate"]))
         tempat(52, pz, 1.2)
-    gerbang_kebun.append(part("BalokGerbangKebun", (52, 8.6, -4), (1.2, 1.0, 13), PAL["kayu_muda"], M["planks"]))
+    gerbang_kebun.append(part("BalokGerbangKebun", (52, 8.6, -5.5), (1.2, 1.0, 19), PAL["kayu_muda"], M["planks"]))
     for s in (-1, 1):
-        gerbang_kebun.append(part("AtapGerbangKebun", (52 - s * 0.5, 9.6, -4), (1.6, 0.6, 14), PAL["atap"], M["brick"], "block", 0, True, 0, 0, 22 * s))
-    papan = part("PapanGerbangKebun", (52, 6.6, -4), (0.6, 2.6, 11), PAL["papan"], M["planks"])
+        gerbang_kebun.append(part("AtapGerbangKebun", (52 - s * 0.5, 9.6, -5.5), (1.6, 0.6, 20), PAL["atap"], M["brick"], "block", 0, True, 0, 0, 22 * s))
+    papan = part("PapanGerbangKebun", (52, 6.6, -5.5), (0.6, 2.6, 13), PAL["papan"], M["planks"])
     add_text_surface(papan, FACE["left"], "KEBUN DEMONSTRASI", PAL["teks_gelap"])
     gerbang_kebun.append(papan)
     for item in gerbang_kebun:
@@ -792,7 +833,7 @@ def build_riverside():
     bunga_k = [(206, 194, 160), (196, 182, 148), (178, 182, 198), (188, 170, 130), (204, 196, 168), (182, 176, 142)]
     for i in (0, 3):
         px, pz = PAD_PROMENADE[i]
-        for k in range(6):
+        for k in range(4):
             a = math.radians(k * 60 + 30)
             fx, fz = px + 4.6 * math.cos(a), pz + 4.6 * math.sin(a)
             if bebas(fx, fz, 0.8, di_jalan=True):
@@ -813,7 +854,7 @@ def build_dermaga():
     items = []
     yaw = math.degrees(math.atan2(0.292, 0.953))
     cx, cz = 59.4, 169.6
-    deck = part("DekDermaga", (cx, 0.8, cz), (0.8, 6, 14), PAL["kayu_muda"], M["planks"])
+    deck = part("DekDermaga", (cx, 0.8, cz), (6, 0.8, 14), PAL["kayu_muda"], M["planks"])
     deck.props[8] = p_cframe("CFrame", (cx, 0.8, cz), rot_matrix(yaw))
     items.append(deck)
     for sx in (-1, 1):
@@ -839,7 +880,7 @@ def build_tata_hijau():
     items = []
     rng = random.Random(7)
     for arah in ("barat", "timur", "utara", "selatan"):
-        for u in range(30, 214, 34):
+        for u in range(30, 214, 44):
             if arah == "barat":
                 kandidat = [(-u, 16), (-u, -16)]
             elif arah == "timur":
@@ -852,7 +893,7 @@ def build_tata_hijau():
                 if bebas(x, z, 3.2):
                     items += pohon(x, z, rng)
     for (gx, gz, gr) in GEROMBOLAN:
-        for k in range(4):
+        for k in range(3):
             a = math.radians(k * 90 + 45)
             radius = min(gr * 0.5, 30)
             x, z = gx + radius * math.cos(a), gz + radius * math.sin(a)
@@ -895,14 +936,14 @@ def build_dekorasi():
     kincir.add(script_item("Script", "AnimasiKincir", ANIMASI_KINCIR))
     dekor.add(kincir)
     tempat(wx, wz, 14)
-    if tempat(-46, -38, 4):
-        dekor.add(part("BodiGerobak", (-46, 3.5, -38), (6, 2.6, 4), PAL["kayu_muda"], M["planks"]))
+    if tempat(-56, -30, 4):
+        dekor.add(part("BodiGerobak", (-56, 3.5, -30), (6, 2.6, 4), PAL["kayu_muda"], M["planks"]))
         for sz in (-1, 1):
-            dekor.add(part("RodaGerobak", (-46, 1.5, -38 + sz * 1.6), (0.8, 3, 3), PAL["kayu"], M["wood"], "cylinder", 0, True, 90))
+            dekor.add(part("RodaGerobak", (-56, 1.5, -30 + sz * 1.6), (0.8, 3, 3), PAL["kayu"], M["wood"], "cylinder", 0, True, 90))
         for sz in (-1, 1):
-            dekor.add(part("PeganganGerobak", (-42.6, 3.2, -38 + sz), (2.4, 0.6, 0.6), PAL["kayu"], M["wood"]))
+            dekor.add(part("PeganganGerobak", (-52.6, 3.2, -30 + sz), (2.4, 0.6, 0.6), PAL["kayu"], M["wood"]))
         for k, (ox, oz) in enumerate(((-1.2, -1), (1.2, 0.8), (0, 1.2))):
-            dekor.add(part("KarungGerobak%d" % k, (-46 + ox, 5.6, -38 + oz), (2, 2, 2), PAL["karung"], M["smooth"], "ball"))
+            dekor.add(part("KarungGerobak%d" % k, (-56 + ox, 5.6, -30 + oz), (2, 2, 2), PAL["karung"], M["smooth"], "ball"))
     return dekor
 
 
@@ -947,7 +988,7 @@ def build_npc():
     npcs = [
         ("NPC_BuSari", [(-46, -50), (-50, -46), (-42, -54)], -90, (226, 190, 156), (110, 118, 96), (70, 68, 62), (150, 120, 80)),
         ("NPC_PakDarsa", [(70, -62), (60, -62), (78, -62)], 135, (220, 186, 152), (96, 116, 88), (60, 58, 54), (120, 90, 60)),
-        ("NPC_Mira", [(32, -8), (36, -7), (28, -9)], -45, (232, 198, 164), (178, 148, 92), (90, 100, 124), (188, 150, 66)),
+        ("NPC_Mira", [(40, -8), (44, -7), (36, -9)], -45, (232, 198, 164), (178, 148, 92), (90, 100, 124), (188, 150, 66)),
     ]
     for name, kandidat, yaw, skin, shirt, pants, hat in npcs:
         lokasi = pilih_di_jalan(kandidat, 4)
@@ -997,9 +1038,9 @@ def build_lighting():
 
 
 def build_spawn(items_lanskap):
-    items_lanskap.append(part("PelataranDatang", (16, 0.0, 40), (0.6, 18, 18), PAL["cobble"], M["cobble"]))
+    items_lanskap.append(part("PelataranDatang", (16, 0.0, 40), (18, 0.6, 18), PAL["cobble"], M["cobble"]))
     RECTS.append((7, 31, 25, 49))
-    for (lx, lz) in ((10, 34), (22, 46)):
+    for (lx, lz) in ((10, 34), (12, 46)):
         if tempat(lx, lz, 1.5):
             items_lanskap += lampu_at(lx, lz)
 
@@ -1016,8 +1057,8 @@ def build_world():
     for item in lanskap_items:
         lanskap.add(item)
     workspace.add(lanskap)
-    alun = folder("AlunAlun")
-    for item in build_plaza():
+    alun = folder("PadangDataran")
+    for item in build_padang():
         alun.add(item)
     workspace.add(alun)
     workspace.add(spawn_location("SpawnDataran", (16, 0.3, 40), (14, 0.6, 14), (128, 146, 104)))

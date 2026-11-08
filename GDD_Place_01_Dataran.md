@@ -567,3 +567,61 @@ Revisi ini menerapkan desain arsitektural yang terarah:
   sungai) + 5 pad belokan; menghubungkan JalanSungai, dermaga, dan sisi barat.
 - Jembatan kayu boulevard selatan menyeberangi sungai di (0,190) — poros tetap
   lurus sampai gerbang Perladangan.
+
+==================================================
+
+10. MASTERPLAN V3 — PADANG CIVIC (8 NOV 2026, ARAHAN KEDUA PEMILIK)
+
+==================================================
+
+Arahan: pelajari cara dataran-dataran kota dunia menyusun ruangnya — contoh yang
+disebut pemilik: Dataran Merdeka (Malaysia), Dataran Klang, Dataran Pahlawan
+(Melaka), dan Oculus (New York). Ambil PRINSIP-nya, bukan bentuknya. Semua karya
+murni original — tidak meniru, tidak memplagiat, tidak membawa bendera atau simbol
+negara apa pun.
+
+10.1 PRINSIP YANG DIADOPSI (DARI PRATINJAU REALITAS, BUKAN REPLIKA)
+
+- Dataran Merdeka → prinsip "padang hijau formal dikelilingi tepi terbangun":
+  lapangan persegi rapi yang dihadapi bangunan berkolonad, dengan landmark menara
+  di tepi sebagai latar sumbu visual, dan ruang terbuka panjang untuk berkumpul.
+- Dataran Klang/Pahlawan → prinsip "monumen pusat + menara pengamat + plaza
+  berlapis": satu titik fokus di tengah, penanda tinggi yang terlihat dari kejauhan,
+  ruang yang bertingkat antara ramai dan tenang.
+- Oculus → prinsip "ritme rusuk struktural + cahaya lewat sela": susunan bilah
+  berulang yang menaungi ruang tanpa menutupnya. Diimplementasikan sebagai
+  PAVILIUN CAHAYA: kanopi cakram bersisi 6 rusuk putih + cincin atas di atas air
+  mancur, terbuka pada sumbu timur-barat. Bentuk, bahan, dan proporsi dirancang
+  sendiri — bukan tiruan bangunan mana pun.
+
+10.2 WUJUD DI DUNIA (SEMUA ORIGINAL)
+
+- PADANG DATARAN: persegi 60x44 stud (x ±30, z ±22) rumput formal, dikepung
+  kolonade batu-kayu di tepi timur & barat (kolom 1.2x6.8, balok lintel, celah
+  gerbang di mulut jalan), pagar hidup di tepi utara & selatan.
+- SUMBU: boulevard timur-barat menembus padang sebagai jalan cobble 16 (SumbuBarat,
+  SumbuTimur) menuju air mancur pusat; jalan diagonal rerouting mulai dari tepi
+  padang (Toko dari barat, Kebun menembus gerbang kayu, Desa dari tenggara,
+  Sungai dari pintu tengah selatan).
+- MENARA DATARAN (landmark, 28 stud): di (-20,-30) menghadap padang — plinth batu,
+  batang plester, kotak jam dua muka bertuliskan "MENARA DATARAN" / "PADANG CIVIC",
+  lis, atap piramida dua bidang, puncak granit. Pengganti fungsi menara jam kota:
+  penanda waktu & arah, bukan replika bangunan bersejarah mana pun.
+- PAVILIUN CAHAYA: 6 rusuk putih (tinggi 13) + 6 segmen cincin pada radius 14
+  keliling air mancur — rusuk mengikuti irama 60 derajat, terbuka lebar di sumbu.
+- Komposisi tumbuhan dipangkas agar rapi: allee boulevard jarak 44, gerombolan
+  bukit 3 pohon per klaster, bunga dusun 2 per taman, bunga padang 3 per sudut.
+
+10.3 ATURAN YANG MENEMPEL (WAJIB, JANGAN LUPA)
+
+1. Karya 100% mandiri: tidak meniru bentuk bangunan nyata, tidak mengambil nama,
+   tidak mengambil rasio khas bangunan bersejarah. Referensi hanya untuk PRINSIP
+   tata ruang.
+2. TIDAK ADA bendera, tiang bendera, lambang negara, warna kebangsaan — identitas
+   kawasan lewat material, tipografi papan, dan komposisi.
+3. Setiap revisi dunia: rebuild → validasi (XML OK, part ≤1100, token bersih,
+   NPC lengkap) → commit → push GitHub → (jika kunci aktif) publish.
+4. Disiplin publish Roblox: body polos (application/octet-stream), tanpa base64/
+   zip/JSON; kunci pemilik umur pendek — salin dari console DAN langsung pakai;
+   kunci console berstatus Active, tetapi salinan lama berisi JWT yang kedaluwarsa
+   (terbukti: 8 varian kunci diuji; hanya baseApiKey+JWT segar yang dikenali).

@@ -31,7 +31,7 @@ python3 download/Dataran-Roblox/scripts-generasi/validate_rbxlx.py
 ```
 
 Hasil: 5 file `.rbxlx` + `.rbxl` (biner) diperbarui di `download/Dataran-Roblox/`.
-Kondisi terakhir Dataran: **1.091 part** (target ≤1.100), 3 NPC, masterplan GDD Bagian 9.
+Kondisi terakhir Dataran: **1.073 part** (target ≤1.100), 3 NPC, masterplan GDD Bagian 9 + 10 (Padang Civic).
 
 ## 4. Cara Publish ke Roblox
 
@@ -48,9 +48,14 @@ script di atas**. Kunci disimpan lokal di `~/my-project/.secrets/akiomida.env`
 ## 5. Riwayat Publish
 
 - Dataran v68 + 4 kawasan luar v3 — 8 Nov 2026 (revisi "layak MMORPG", sebelum masterplan).
-- Revisi **masterplan arsitektural** (okupansi anti-tumpang tindih, bangunan berarsitektur,
-  totem penunjuk, promenade sungai) — **sudah dibangun & tervalidasi, MENUNGGU kunci
-  baru untuk publish** (kunci kadaluarsa sebelum sempat dipakai).
+- Revisi **masterplan v2 arsitektural** (okupansi anti-tumpang tindih, bangunan
+  berarsitektur, totem penunjuk, promenade sungai) — dibangun & tervalidasi.
+- Revisi **masterplan v3 Padang Civic** (8 Nov 2026): padang persegi berkolonade,
+  sumbu cobble, Menara Dataran, Paviliun Cahaya berusuk, rerouting 4 jalan diagonal
+  dari tepi padang, perbaikan bug orientasi ukuran part (jalan/lantai), trim tumbuhan
+  — part 1.073, 3 NPC, token bersih. **MENUNGGU kunci segar untuk publish**;
+  kunci lama: console Active tetapi JWT dalam salinan kedaluwarsa (8 varian kunci
+  diuji; body publish sudah benar octet-stream polos).
 - Backup GitHub: commit `af240c3` (deliverable) + `0cf65bc` (generator) dan seterusnya.
 
 ## 6. Kredensial yang Diperlukan
