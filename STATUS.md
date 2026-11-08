@@ -62,7 +62,7 @@ script di atas**. Kunci disimpan lokal di `~/my-project/.secrets/akiomida.env`
 
 | Kredensial | Dipakai untuk | Status |
 | --- | --- | --- |
-`ROBLOX_SECURITY` (kunci Open Cloud, umur 1 jam) | publish 5 place | **perlu kunci baru** |
+`ROBLOX_SECURITY` (kunci Open Cloud, umur 1 jam) | publish 5 place | **perlu kunci baru DENGAN scope `universe.place:write`** — kunci 8 Nov 15:06 UTC ditolak: Scope not authorized |
 | `GITHUB_TOKEN` (fine-grained PAT, user `xdeltami`) | push backup | **valid** |
 
 Kredensial TIDAK PERNAH di-commit — `.gitignore` sudah menutup `.secrets/`.
