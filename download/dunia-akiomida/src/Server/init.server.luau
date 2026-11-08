@@ -192,7 +192,7 @@ local function enterServer(player: Player)
                                 notify(player, "Tas Dibersihkan", tostring(dibuang) .. " item lama yang tidak dipakai sudah dibuang otomatis dari tas.")
                         end
                         if ok then
-                                notify(player, "Pusat Kota", "Selamat datang! Lewati Gerbang Dunia atau tombol Masuk untuk ke duniamu.")
+                                notify(player, "Dataran", "Selamat datang! Lewati Gerbang Dunia atau tombol Masuk untuk ke duniamu.")
                         else
                                 if alasan == "kunci" then
                                         AuditService.catat(player, "sesi_ganda", "load")

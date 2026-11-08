@@ -377,7 +377,7 @@ end
 
 function ZonaService.pulang(player: Player): (boolean, string)
         if placeWait(player, kotaPos(), "kota", nil) then
-                return true, "Kembali ke Pusat Kota."
+                return true, "Kembali ke Dataran."
         end
         return false, "Karakter belum siap. Coba lagi sebentar."
 end

@@ -1,6 +1,47 @@
 # DUNIA AKIOMIDA (Roblox)
 
-Status: LIVE di Roblox (**versionNumber 70**, 8 Nov 2026) — **DATARAN V2: PERBAIKAN TENGGELAM TUNTAS + JALAN MASTERPLAN (ASPAL + JALUR SEPEDA + TROTOAR + MARKA + ZEBRA CROSS) + PAPAN NAMA JALAN + TAMAN TERTATA + JEMBATAN RATA JALAN**
+Status: SIAP PUBLISH (**build v71**, 8 Nov 2026, menunggu API key baru) — **DATARAN V3: 4 KAWASAN BARU MENGISI LAHAN KOSONG (TAMAN RAKYAT, LAPANGAN DESA, KEBUN RAYA, PANGGUNG BUDAYA) + LABEL "PUSAT KOTA" DIHALUSKAN JADI "DATARAN AKIOMIDA" + HUB LEBIH RAMAI** (v70 = versionNumber 70 sudah LIVE)
+
+BARU v71 — ISI LAHAN KOSONG + LABEL DIHALUSKAN (laporan pemilik: "Masih banyak
+lahan kosong benahi lah dan label pusat kota dihaluskan dong ini kan dataran"):
+
+1. **4 KAWASAN BARU mengisi 4 lahan kosong besar** — (a) **Taman Rakyat**
+   (barat laut): taman bermain lengkap (ayunan ganda, perosotan biru,
+   jungkat-jungkit, kotak pasir), 2 saung atap pelana, kolam bebek dengan
+   2 bebek mengapung + batu pinggir, setapak masuk dari jalan Barat, NPC
+   Penjaga Taman; (b) **Lapangan Desa** (barat daya): 2 lapangan bulu
+   tangis (slab hijau + garis putih + net) + 1 lapangan basket (papan
+   pantul + ring), 2 lampu sorot SpotLight, tribin bangku, NPC Anak
+   Lapangan, setapak dari jalan penghubung; (c) **Kebun Raya** (timur
+   laut): 6 petak bunga terangkat warna-warni, pergola jejala bersulur,
+   rumah kaca mini (dinding & atap kaca + 5 tanaman), sepasang kupu-kupu
+   beterbangan, NPC Tukang Kebun, setapak dari jalan Utara; (d) **Panggung
+   Budaya** (tenggara): panggung kayu beratap + tangga, 6 bangku tribun
+   penonton, tiang bendera merah putih, saung balai warga, sawah mini 4
+   petak berisi gandum, gerobak jajan, NPC Seniman Dataran (di atas
+   panggung) & Penjual Jajan, setapak dari jalan Selatan.
+2. **LABEL "PUSAT KOTA" DIHALUSKAN** — sesuai karakter dataran hijau:
+   papan besar spawn kini "DATARAN AKIOMIDA"; papan toko "Toko Benih
+   Dataran"; semua teks UI & notifikasi ("Pusat Kota" → "Dataran",
+   "Pulang ke Pusat Kota" → "Pulang ke Dataran", pesan selamat datang
+   & pulang ikut disesuaikan).
+3. **HUB SPAWN LEBIH RAMAI** — rumput kiri-kanan jalur spawn yang polos
+   diisi 4 pohon hias, 2 bed bunga, 2 bangku taman.
+4. **PENGAAYAAN RUMPUT SISA** — +10 pohon pelanjang baru + 24 titik semak
+   bulat di sepanjang jaringan jalan; 2 titik bunga dipindah dari jalur
+   setapak lapangan.
+5. **BUG TERTEMU UJIAN & DIPERBAIKI** — papan "SELAMAT DATANG DI DATARAN"
+   dulu berdiri tepat di koridor jalan Penghubung (tiang menghalangi
+   kendaraan); dipindah ke tepi barat daya plaza.
+6. **UJIAN REGRESI DIPERPIT + CERDAS** — playtest +8 cek baru: 4 kawasan
+   ada, >= 20 model fasilitas, tidak ada fasilitas tenggelam, NPC >= 14,
+   perabot plaza di lantai plaza, koridor 6 jalan bebas penghalang
+   (audit CanCollide + ijin gerbang/rak sepeda), aspal tak koplanar.
+   Kalkulasi tenggelam kini sadar-rotasi (8 pojok AABB) sehingga cakram
+   air/atap kaca miring tidak lagi dianggap terkubur; bola dekoratif
+   (batu alam) dikecualikan karena memang ditanam sebagian.
+7. **HASIL UJI**: run_tests 421 PASS, playtest 228 PASS (dari 206),
+   massa 122 PASS, luau-lsp 0 temuan; build v71 siap publish.
 
 BARU v70 — PERBAIKAN TENGGELAM + JALAN MASTERPLAN RAPI (verifikasi laporan pemilik: "Ini bagus hanya saja kenapa bangunan masyarakat itu tenggelam dan ada beberapa NPC yang tenggelam... lebih diperkaya lagi... ada jalan aspal jalan pesepeda dan semuanya tertata seperti sudah ada masterplan nya"):
 

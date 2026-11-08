@@ -1233,3 +1233,36 @@ seketika (CFrame); gerbang di Pusat Kota membuka panel Masuk/Kunjungi dunia.
    `export ROBLOX_API_KEY="$(grep -E '^ROBLOX_API_KEY=' /home/z/my-project/.secrets/akiomida.env | cut -d= -f2-)"`
    `python3 publish.py --universe-id 10774464946 --place-id 77626159664192 --file build/DuniaAkiomida.rbxlx`
 6. Update README.md + tabel skor di file ini setiap publish.
+
+## Skor v71 (build siap publish, 8 Nov 2026) - ISI LAHAN KOSONG + LABEL DIHALUSKAN
+
+Laporan pemilik: "Masih banyak lahan kosong benahi lah dan label pusat kota
+dihaluskan dong ini kan dataran". Yang dikerjakan di v71:
+
+1. **4 kawasan baru** mengisi 4 kuadran kosong besar: Taman Rakyat (taman
+   bermain + saung + kolam bebek), Lapangan Desa (2 bulu tangkis + basket
+   + lampu sorot), Kebun Raya (6 petak bunga + pergola + rumah kaca +
+   kupu-kupu), Panggung Budaya (panggung + tribun + bendera merah putih +
+   sawah mini) — semua tersambung setapak ke jaringan jalan.
+2. **Label dihaluskan** sesuai karakter dataran: papan spawn "DATARAN
+   AKIOMIDA", papan toko "Toko Benih Dataran", seluruh teks UI "Pusat
+   Kota" → "Dataran".
+3. **Hub spawn lebih ramai** (4 pohon + 2 bed bunga + 2 bangku) dan rumput
+   sisa diisi +10 pohon + 24 semak.
+4. **Ujian menemukan bug nyata**: papan selamat datang berdiri di koridor
+   jalan Penghubung — dipindah ke tepi plaza. Audit tenggelam kini sadar-
+   rotasi (8 pojok AABB) + bola dekoratif dikecualikan.
+
+| # | Kategori | Skor | Alasan |
+|---|----------|------|--------|
+| 1 Kombat | 0/10 | Belum ada monster/AI/bos. |
+| 2 Crafting | 4.5/10 | Tetap dari #51. |
+| 3 Stat & Progresi | 1/10 | Tanpa level (sesuai arah pemilik). |
+| 4 Ekonomi | 9/10 | Tetap dari #60 (integritas data). |
+| 5 Dunia & Peta | 8/10 | Naik dari 7.5: 4 kawasan bertema mengisi lahan kosong (taman bermain, olahraga, kebun raya, panggung budaya), hub lebih ramai, label selaras identitas dataran. |
+| 6 Multiplayer | 7/10 | Tetap dari #51. |
+| 7 Bertani | 10/10 | Tetap. |
+| 8 Polish & UX | 10/10 | Tetap: anti z-fight + geometri terkunci ujian; audit kini sadar-rotasi dan menemukan papan di jalan. |
+| 9 Originalitas | 10/10 | Tetap. |
+
+**TOTAL: 61.5/100** (bobot: 0+67.5+10+135+80+70+100+100+50 = 615/10 = 61.5)

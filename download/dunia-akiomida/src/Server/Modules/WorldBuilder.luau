@@ -302,7 +302,9 @@ function WorldBuilder.buildHub(hooks)
                 end
         end)
 
-        signBoard(root, -30, 6, gt, "PUSAT KOTA")
+        -- label dihaluskan (v71): kawasan ini dataran hijau, bukan kota;
+        -- papan selamat datang memakai identitas tempat
+        signBoard(root, -30, 6, gt, "DATARAN AKIOMIDA")
 
         local toko = BuildingKit.buildToko(root)
         toko:PivotTo(CFrame.new(0, gt, -60) * CFrame.Angles(0, math.rad(180), 0))
@@ -365,6 +367,16 @@ function WorldBuilder.buildHub(hooks)
         -- pohon hias direlokasi dari z=-12 (koridor jalan) ke rumput selatan
         pohonHias(root, -20, -25, gt)
         pohonHias(root, 20, -25, gt)
+        -- pengayaan v71: rumput spawn kiri-kanan yang polos diisi pohon,
+        -- bed bunga, dan bangku agar lapangan terasa ramah
+        pohonHias(root, -26, 24, gt)
+        pohonHias(root, 26, 22, gt)
+        pohonHias(root, -27, 52, gt)
+        pohonHias(root, 27, 50, gt)
+        bedBunga(root, -20, 42, gt, 5, 2.4, 4)
+        bedBunga(root, 20, 42, gt, 5, 2.4, 4)
+        bangkuTaman(root, -16, 30, gt, math.pi / 2)
+        bangkuTaman(root, 16, 30, gt, -math.pi / 2)
         bangkuTaman(root, -7.5, -40, gt, math.pi / 2)
         bangkuTaman(root, 7.5, -40, gt, -math.pi / 2)
         -- tiang bendera digeser dari x=±5.5 ke x=±7.8 (dulu tepat di trotoar

@@ -572,6 +572,515 @@ local function kawananBurung(parent: Instance, cx: number, cz: number)
         end
 end
 
+-- ====================================================================
+-- PENGAYAAN v71: mengisi lahan kosong dengan 4 kawasan bertema supaya
+-- dataran terasa hidup, bukan rumput luas yang polos.
+-- ====================================================================
+
+local function semak(parent: Instance, x: number, z: number, skala: number?)
+        local k = skala or 1
+        local b = part(parent, Vector3.new(1.5 * k, 1 * k, 1.5 * k), CFrame.new(x, GT + 0.5 * k, z), RUMPUT_TUA, Enum.Material.Grass)
+        b.Shape = Enum.PartType.Ball
+end
+
+-- Petak bunga terangkat: bingkai batu + tanah gembur + bola bunga warna.
+local function petakBunga(parent: Instance, x: number, z: number, w: number, d: number)
+        part(parent, Vector3.new(w + 0.6, 0.5, 0.45), CFrame.new(x, GT + 0.25, z - d / 2), TROTOAR, Enum.Material.Concrete)
+        part(parent, Vector3.new(w + 0.6, 0.5, 0.45), CFrame.new(x, GT + 0.25, z + d / 2), TROTOAR, Enum.Material.Concrete)
+        part(parent, Vector3.new(0.45, 0.5, d + 0.6), CFrame.new(x - w / 2, GT + 0.25, z), TROTOAR, Enum.Material.Concrete)
+        part(parent, Vector3.new(0.45, 0.5, d + 0.6), CFrame.new(x + w / 2, GT + 0.25, z), TROTOAR, Enum.Material.Concrete)
+        part(parent, Vector3.new(w, 0.35, d), CFrame.new(x, GT + 0.32, z), TANAH, Enum.Material.Ground)
+        local nx = math.max(math.floor(w / 1.6), 2)
+        local nz = math.max(math.floor(d / 1.6), 2)
+        for i = 0, nx - 1 do
+                for j = 0, nz - 1 do
+                        local fx = x - w / 2 + (w / nx) * (i + 0.5)
+                        local fz = z - d / 2 + (d / nz) * (j + 0.5)
+                        local batang = part(parent, Vector3.new(0.16, 0.6, 0.16), CFrame.new(fx, GT + 0.75, fz), RUMPUT_TUA, Enum.Material.Grass)
+                        batang.CanCollide = false
+                        local kepala = part(parent, Vector3.new(0.5, 0.5, 0.5), CFrame.new(fx, GT + 1.15, fz), BUNGA_LIAR[(i * 3 + j + math.floor(x)) % #BUNGA_LIAR + 1], Enum.Material.SmoothPlastic)
+                        kepala.Shape = Enum.PartType.Ball
+                        kepala.CanCollide = false
+                end
+        end
+end
+
+-- Saung (gazebo): lantai batu, 4 pilar, atap pelana, bangku di dalam.
+local function gazebo(parent: Instance, x: number, z: number, lebar: number)
+        local m = Instance.new("Model")
+        m.Name = "Gazebo"
+        m.Parent = parent
+        part(m, Vector3.new(lebar, 0.5, lebar), CFrame.new(0, 0.25, 0), BATU, Enum.Material.Concrete)
+        for _, sx in ipairs({ -1, 1 }) do
+                for _, sz in ipairs({ -1, 1 }) do
+                        part(m, Vector3.new(0.6, lebar * 0.62, 0.6), CFrame.new(sx * (lebar / 2 - 0.8), 0.5 + lebar * 0.31, sz * (lebar / 2 - 0.8)), KAYU_TUA, Enum.Material.Wood)
+                end
+        end
+        for _, sx in ipairs({ -1, 1 }) do
+                part(m, Vector3.new(0.25, 0.65, 0.8), CFrame.new(sx * lebar * 0.18, 0.825, lebar / 2 - 1.4), KAYU_TUA, Enum.Material.Wood)
+        end
+        part(m, Vector3.new(lebar * 0.5, 0.25, 1), CFrame.new(0, 1.15, lebar / 2 - 1.4), KAYU, Enum.Material.Wood)
+        part(m, Vector3.new(lebar * 0.5, 0.7, 0.2), CFrame.new(0, 1.6, lebar / 2 - 0.9), KAYU, Enum.Material.Wood)
+        BuildingKit.gableRoof(m, lebar, lebar, 1.4, 0.5 + lebar * 0.62, ATAP)
+        m.WorldPivot = CFrame.new(0, 0, 0)
+        m:PivotTo(CFrame.new(x, GT, z))
+end
+
+-- Ayunan ganda: rangka A dua sisi, balok atas, dua dudukan tali.
+local function ayunan(parent: Instance, x: number, z: number, yaw: number)
+        local m = Instance.new("Model")
+        m.Name = "Ayunan"
+        m.Parent = parent
+        local cf = CFrame.new(x, GT, z) * CFrame.Angles(0, yaw, 0)
+        for _, sx in ipairs({ -2.2, 2.2 }) do
+                part(m, Vector3.new(0.5, 3.4, 0.5), cf * CFrame.new(sx, 1.7, -1), KAYU_TUA, Enum.Material.Wood)
+                part(m, Vector3.new(0.5, 3.4, 0.5), cf * CFrame.new(sx, 1.7, 1), KAYU_TUA, Enum.Material.Wood)
+        end
+        part(m, Vector3.new(5.2, 0.5, 0.5), cf * CFrame.new(0, 3.55, 0), KAYU, Enum.Material.Wood)
+        part(m, Vector3.new(5.2, 0.4, 2.6), cf * CFrame.new(0, 0.2, 0), KAYU_TUA, Enum.Material.Wood)
+        for _, sx in ipairs({ -1.2, 1.2 }) do
+                for _, dt in ipairs({ -0.22, 0.22 }) do
+                        local tali = part(m, Vector3.new(0.12, 1.9, 0.12), cf * CFrame.new(sx + dt, 2.55, 0), KAYU_TUA, Enum.Material.Wood)
+                        tali.CanCollide = false
+                end
+                part(m, Vector3.new(1.1, 0.22, 0.55), cf * CFrame.new(sx, 1.5, 0), KAYU, Enum.Material.Wood)
+        end
+end
+
+-- Perosotan: tangga samping, platform atas, seluncuran biru miring.
+local function perosotan(parent: Instance, x: number, z: number, yaw: number)
+        local m = Instance.new("Model")
+        m.Name = "Perosotan"
+        m.Parent = parent
+        local cf = CFrame.new(x, GT, z) * CFrame.Angles(0, yaw, 0)
+        for _, sx in ipairs({ -0.9, 0.9 }) do
+                part(m, Vector3.new(0.35, 3, 0.35), cf * CFrame.new(sx, 1.5, -3.5), KAYU_TUA, Enum.Material.Wood)
+                part(m, Vector3.new(0.35, 3, 0.35), cf * CFrame.new(sx, 1.5, -1.7), KAYU_TUA, Enum.Material.Wood)
+        end
+        part(m, Vector3.new(2.4, 0.35, 2.2), cf * CFrame.new(0, 3.15, -2.6), KAYU, Enum.Material.WoodPlanks)
+        for i = 0, 3 do
+                part(m, Vector3.new(1.5, 0.16, 0.4), cf * CFrame.new(1.7, 0.75 + i * 0.8, -2.6), KAYU, Enum.Material.Wood)
+        end
+        part(m, Vector3.new(0.3, 2.6, 0.3), cf * CFrame.new(2.45, 1.3, -1.9), KAYU_TUA, Enum.Material.Wood)
+        part(m, Vector3.new(0.3, 2.6, 0.3), cf * CFrame.new(2.45, 1.3, -3.3), KAYU_TUA, Enum.Material.Wood)
+        local lereng = math.rad(31)
+        local seluncur = part(m, Vector3.new(1.6, 0.25, 5.7), cf * CFrame.new(0, 1.83, 0.1) * CFrame.Angles(lereng, 0, 0), Color3.fromRGB(90, 160, 205), Enum.Material.SmoothPlastic)
+        seluncur.Name = "Seluncuran"
+        for _, sx in ipairs({ -0.75, 0.75 }) do
+                local pag = part(m, Vector3.new(0.15, 0.5, 5.7), cf * CFrame.new(sx, 2.05, 0.1) * CFrame.Angles(lereng, 0, 0), Color3.fromRGB(70, 130, 175), Enum.Material.SmoothPlastic)
+                pag.CanCollide = false
+        end
+end
+
+-- Jungkat-jungkit: tumpuan beton, papan jungkit, pegangan dua ujung.
+local function jungkatJungkit(parent: Instance, x: number, z: number, yaw: number)
+        local m = Instance.new("Model")
+        m.Name = "JungkatJungkit"
+        m.Parent = parent
+        local cf = CFrame.new(x, GT, z) * CFrame.Angles(0, yaw, 0)
+        part(m, Vector3.new(1, 0.9, 1), cf * CFrame.new(0, 0.45, 0), BATU, Enum.Material.Concrete)
+        part(m, Vector3.new(0.4, 0.22, 7.2), cf * CFrame.new(0, 1.02, 0) * CFrame.Angles(math.rad(6), 0, 0), KAYU, Enum.Material.Wood)
+        for _, sz in ipairs({ -1, 1 }) do
+                local yPapan = 1.02 - sz * 2.9 * math.sin(math.rad(6))
+                for _, sx in ipairs({ -0.45, 0.45 }) do
+                        part(m, Vector3.new(0.28, 0.7, 0.28), cf * CFrame.new(sx, yPapan + 0.55, sz * 2.9), KAYU_TUA, Enum.Material.Wood)
+                end
+                part(m, Vector3.new(1.2, 0.24, 0.3), cf * CFrame.new(0, yPapan + 1.0, sz * 2.9), KAYU, Enum.Material.Wood)
+        end
+end
+
+-- Kotak pasir bermain: bingkai kayu, pasir, ember & kotak mainan.
+local function kotakPasir(parent: Instance, x: number, z: number)
+        local m = Instance.new("Model")
+        m.Name = "KotakPasir"
+        m.Parent = parent
+        part(m, Vector3.new(6.4, 0.5, 0.4), CFrame.new(x, GT + 0.25, z - 3), KAYU, Enum.Material.Wood)
+        part(m, Vector3.new(6.4, 0.5, 0.4), CFrame.new(x, GT + 0.25, z + 3), KAYU, Enum.Material.Wood)
+        part(m, Vector3.new(0.4, 0.5, 5.6), CFrame.new(x - 3, GT + 0.25, z), KAYU, Enum.Material.Wood)
+        part(m, Vector3.new(0.4, 0.5, 5.6), CFrame.new(x + 3, GT + 0.25, z), KAYU, Enum.Material.Wood)
+        part(m, Vector3.new(5.6, 0.3, 5.2), CFrame.new(x, GT + 0.2, z), KERING, Enum.Material.Ground)
+        part(m, Vector3.new(0.7, 0.7, 0.7), CFrame.new(x + 1.3, GT + 0.55, z - 1), Color3.fromRGB(206, 84, 70), Enum.Material.SmoothPlastic)
+        part(m, Vector3.new(0.5, 0.5, 0.5), CFrame.new(x - 1.4, GT + 0.45, z + 0.8), Color3.fromRGB(236, 196, 90), Enum.Material.SmoothPlastic)
+end
+
+-- Bebek kolam: badan + kepala + paruh (mengapung di kolam).
+local function bebek(parent: Instance, x: number, z: number, yaw: number)
+        local m = Instance.new("Model")
+        m.Name = "Bebek"
+        m.Parent = parent
+        local cf = CFrame.new(x, GT, z) * CFrame.Angles(0, yaw, 0)
+        local badan = part(m, Vector3.new(1.5, 1, 1.1), cf * CFrame.new(0, 0.55, 0), PUTIH, Enum.Material.SmoothPlastic)
+        badan.Shape = Enum.PartType.Ball
+        local kepala = part(m, Vector3.new(0.7, 0.7, 0.7), cf * CFrame.new(0.6, 1.2, 0), PUTIH, Enum.Material.SmoothPlastic)
+        kepala.Shape = Enum.PartType.Ball
+        local paruh = part(m, Vector3.new(0.45, 0.2, 0.3), cf * CFrame.new(1.05, 1.15, 0), Color3.fromRGB(236, 160, 60), Enum.Material.SmoothPlastic)
+        paruh.CanCollide = false
+end
+
+-- Kolam bebek: cakram air, batu pinggir, dua bebek renang.
+local function kolamBebek(parent: Instance, x: number, z: number)
+        local m = Instance.new("Model")
+        m.Name = "KolamBebek"
+        m.Parent = parent
+        local air = part(m, Vector3.new(0.24, 13, 13), CFrame.new(x, GT + 0.12, z) * CFrame.Angles(0, 0, math.rad(90)), AIR, Enum.Material.Glass, 0.3)
+        air.Shape = Enum.PartType.Cylinder
+        air.CanCollide = false
+        for i = 0, 9 do
+                local a = i * math.pi / 5 + 0.3
+                part(m, Vector3.new(1.3, 0.5, 1.3), CFrame.new(x + math.cos(a) * 7, GT + 0.25, z + math.sin(a) * 7) * CFrame.Angles(0, a, 0), BATU, Enum.Material.Slate)
+        end
+        bebek(m, x - 2.2, z + 1.2, math.rad(25))
+        bebek(m, x + 2.6, z - 1.4, math.rad(-55))
+end
+
+-- Lampu sorot lapangan: tiang tinggi + kepala neon + SpotLight.
+local function lampuSorot(parent: Instance, x: number, z: number, yaw: number)
+        local m = Instance.new("Model")
+        m.Name = "LampuSorot"
+        m.Parent = parent
+        local cf = CFrame.new(x, GT, z) * CFrame.Angles(0, yaw, 0)
+        part(m, Vector3.new(0.6, 8, 0.6), cf * CFrame.new(0, 4, 0), KAYU_TUA, Enum.Material.Metal)
+        local kepala = part(m, Vector3.new(2.4, 1.2, 0.8), cf * CFrame.new(0, 8.4, 0) * CFrame.Angles(math.rad(-30), 0, 0), PUTIH, Enum.Material.Neon)
+        local sorot = Instance.new("SpotLight")
+        sorot.Range = 44
+        sorot.Angle = 80
+        sorot.Brightness = 1.4
+        sorot.Parent = kepala
+end
+
+-- Lapangan bulu tangkis: slab hijau, garis putih, net di tengah.
+local function lapanganBuluTangkis(parent: Instance, x: number, z: number, yaw: number)
+        local m = Instance.new("Model")
+        m.Name = "LapanganBuluTangkis"
+        m.Parent = parent
+        local cf = CFrame.new(x, GT, z) * CFrame.Angles(0, yaw, 0)
+        part(m, Vector3.new(9, 0.14, 17), cf * CFrame.new(0, 0.07, 0), Color3.fromRGB(96, 148, 98), Enum.Material.Concrete)
+        for _, sx in ipairs({ -1, 1 }) do
+                local garis = part(m, Vector3.new(0.3, 0.06, 16.4), cf * CFrame.new(sx * 4.2, 0.18, 0), MARKA, Enum.Material.SmoothPlastic)
+                garis.CanCollide = false
+        end
+        for _, sz in ipairs({ -1, 1 }) do
+                local garis = part(m, Vector3.new(8.4, 0.06, 0.3), cf * CFrame.new(0, 0.18, sz * 8.2), MARKA, Enum.Material.SmoothPlastic)
+                garis.CanCollide = false
+        end
+        for _, sx in ipairs({ -1, 1 }) do
+                part(m, Vector3.new(0.22, 1.7, 0.22), cf * CFrame.new(sx * 4.6, 0.85, 0), KAYU_TUA, Enum.Material.Metal)
+        end
+        local net = part(m, Vector3.new(9.2, 0.55, 0.08), cf * CFrame.new(0, 1.35, 0), Color3.fromRGB(52, 54, 58), Enum.Material.Fabric)
+        net.CanCollide = false
+        local pitaNet = part(m, Vector3.new(9.2, 0.18, 0.1), cf * CFrame.new(0, 1.72, 0), PUTIH, Enum.Material.SmoothPlastic)
+        pitaNet.CanCollide = false
+end
+
+-- Lapangan basket mini: slab abu, papan pantul, ring oranye.
+local function lapanganBasket(parent: Instance, x: number, z: number, yaw: number)
+        local m = Instance.new("Model")
+        m.Name = "LapanganBasket"
+        m.Parent = parent
+        local cf = CFrame.new(x, GT, z) * CFrame.Angles(0, yaw, 0)
+        part(m, Vector3.new(14, 0.14, 10), cf * CFrame.new(0, 0.07, 0), Color3.fromRGB(122, 126, 132), Enum.Material.Concrete)
+        part(m, Vector3.new(0.4, 3.4, 0.4), cf * CFrame.new(0, 1.7, -4.6), KAYU_TUA, Enum.Material.Metal)
+        part(m, Vector3.new(2.8, 1.8, 0.16), cf * CFrame.new(0, 3.6, -4.4), PUTIH, Enum.Material.SmoothPlastic)
+        local ring = part(m, Vector3.new(1, 0.14, 1), cf * CFrame.new(0, 3.05, -3.55), Color3.fromRGB(232, 122, 52), Enum.Material.Metal)
+        ring.Shape = Enum.PartType.Cylinder
+end
+
+-- Pergola jejala: deretan tiang + balok + kisi-kisi + sulur bunga.
+local function pergola(parent: Instance, x: number, z: number, panjang: number, yaw: number)
+        local m = Instance.new("Model")
+        m.Name = "Pergola"
+        m.Parent = parent
+        local cf = CFrame.new(x, GT, z) * CFrame.Angles(0, yaw, 0)
+        for i = 0, 2 do
+                for _, sz in ipairs({ -1, 1 }) do
+                        part(m, Vector3.new(0.45, 3.4, 0.45), cf * CFrame.new(-panjang / 2 + i * (panjang / 2), 1.7, sz * 1.7), KAYU_TUA, Enum.Material.Wood)
+                end
+        end
+        for _, sz in ipairs({ -1, 1 }) do
+                part(m, Vector3.new(panjang + 0.9, 0.4, 0.5), cf * CFrame.new(0, 3.6, sz * 1.7), KAYU, Enum.Material.Wood)
+        end
+        local n = math.floor(panjang / 1.3)
+        for i = 0, n do
+                local gel = part(m, Vector3.new(0.26, 0.16, 4.4), cf * CFrame.new(-panjang / 2 + i * (panjang / n), 3.88, 0), KAYU, Enum.Material.Wood)
+                gel.CanCollide = false
+        end
+        for i = 1, 4 do
+                local vx = -panjang / 2 + panjang * i / 5
+                local sulur = part(m, Vector3.new(1.1, 0.8, 1.6), cf * CFrame.new(vx, 3.35, (i % 2 == 0) and 0.5 or -0.5), RUMPUT_TUA, Enum.Material.Grass)
+                sulur.Shape = Enum.PartType.Ball
+                sulur.CanCollide = false
+                local bungaKecil = part(m, Vector3.new(0.4, 0.4, 0.4), cf * CFrame.new(vx + 0.25, 2.9, (i % 2 == 0) and 0.9 or -0.9), BUNGA_LIAR[i], Enum.Material.SmoothPlastic)
+                bungaKecil.Shape = Enum.PartType.Ball
+                bungaKecil.CanCollide = false
+        end
+end
+
+-- Rumah kaca mini: rangka putih, dinding & atap kaca, bed tanaman di dalam.
+local function rumahKaca(parent: Instance, x: number, z: number)
+        local m = Instance.new("Model")
+        m.Name = "RumahKaca"
+        m.Parent = parent
+        local kaca = Color3.fromRGB(205, 232, 238)
+        part(m, Vector3.new(10, 0.3, 8), CFrame.new(0, 0.15, 0), TROTOAR, Enum.Material.Concrete)
+        part(m, Vector3.new(10, 3, 0.14), CFrame.new(0, 1.8, -4), kaca, Enum.Material.Glass, 0.55)
+        part(m, Vector3.new(0.14, 3, 8), CFrame.new(-5, 1.8, 0), kaca, Enum.Material.Glass, 0.55)
+        part(m, Vector3.new(0.14, 3, 8), CFrame.new(5, 1.8, 0), kaca, Enum.Material.Glass, 0.55)
+        part(m, Vector3.new(3.8, 3, 0.14), CFrame.new(-3.1, 1.8, 4), kaca, Enum.Material.Glass, 0.55)
+        part(m, Vector3.new(3.8, 3, 0.14), CFrame.new(3.1, 1.8, 4), kaca, Enum.Material.Glass, 0.55)
+        for _, sx in ipairs({ -1, 1 }) do
+                for _, sz in ipairs({ -1, 1 }) do
+                        part(m, Vector3.new(0.3, 3, 0.3), CFrame.new(sx * 5, 1.8, sz * 4), PUTIH, Enum.Material.Metal)
+                end
+        end
+        part(m, Vector3.new(10.4, 0.25, 0.25), CFrame.new(0, 3.4, -4), PUTIH, Enum.Material.Metal)
+        part(m, Vector3.new(10.4, 0.25, 0.25), CFrame.new(0, 3.4, 4), PUTIH, Enum.Material.Metal)
+        local slope = math.rad(30)
+        local hd = 4 + 1.2
+        local rise = hd * math.tan(slope)
+        local slabLen = hd / math.cos(slope)
+        local atap1 = part(m, Vector3.new(10.8, 0.14, slabLen), CFrame.new(0, 3.4 + rise / 2, -hd / 2) * CFrame.Angles(-slope, 0, 0), kaca, Enum.Material.Glass, 0.5)
+        atap1.CanCollide = false
+        local atap2 = part(m, Vector3.new(10.8, 0.14, slabLen), CFrame.new(0, 3.4 + rise / 2, hd / 2) * CFrame.Angles(slope, 0, 0), kaca, Enum.Material.Glass, 0.5)
+        atap2.CanCollide = false
+        part(m, Vector3.new(8, 0.4, 2), CFrame.new(0, 0.5, -2.4), TANAH, Enum.Material.Ground)
+        part(m, Vector3.new(8, 0.4, 2), CFrame.new(0, 0.5, 2.4), TANAH, Enum.Material.Ground)
+        m.WorldPivot = CFrame.new(0, 0, 0)
+        m:PivotTo(CFrame.new(x, GT, z))
+        tanamanDemo(m, x - 2.5, z - 2.4, "wortel")
+        tanamanDemo(m, x, z - 2.4, "kubis")
+        tanamanDemo(m, x + 2.5, z - 2.4, "selada")
+        tanamanDemo(m, x - 2.5, z + 2.4, "seledri")
+        tanamanDemo(m, x + 2.5, z + 2.4, "brokoli")
+end
+
+-- Panggung budaya: lantai kayu tinggi, dinding belakang, atap, tangga.
+local function panggung(parent: Instance, x: number, z: number, yaw: number)
+        local m = Instance.new("Model")
+        m.Name = "Panggung"
+        m.Parent = parent
+        part(m, Vector3.new(14, 1, 9), CFrame.new(0, 0.5, 0), KAYU, Enum.Material.WoodPlanks)
+        part(m, Vector3.new(6, 0.4, 1.2), CFrame.new(0, 0.2, 5.1), BATU, Enum.Material.Concrete)
+        part(m, Vector3.new(6, 0.4, 1.2), CFrame.new(0, 0.6, 4.0), BATU, Enum.Material.Concrete)
+        part(m, Vector3.new(14, 4.5, 0.4), CFrame.new(0, 3.25, -4.3), DINDING, Enum.Material.WoodPlanks)
+        part(m, Vector3.new(0.4, 4.5, 9), CFrame.new(-6.8, 3.25, 0), DINDING, Enum.Material.WoodPlanks)
+        part(m, Vector3.new(0.4, 4.5, 9), CFrame.new(6.8, 3.25, 0), DINDING, Enum.Material.WoodPlanks)
+        for _, sx in ipairs({ -1, 1 }) do
+                for _, sz in ipairs({ -1, 1 }) do
+                        part(m, Vector3.new(0.5, 3.2, 0.5), CFrame.new(sx * 5.6, 3.4, sz * 3.2), KAYU_TUA, Enum.Material.Wood)
+                end
+        end
+        BuildingKit.gableRoof(m, 13.6, 8.4, 1.5, 5, ATAP)
+        m.WorldPivot = CFrame.new(0, 0, 0)
+        m:PivotTo(CFrame.new(x, GT, z))
+end
+
+-- Tiang bendera merah putih dengan alas beton bundar.
+local function benderaMerahPutih(parent: Instance, x: number, z: number)
+        local m = Instance.new("Model")
+        m.Name = "BenderaMerahPutih"
+        m.Parent = parent
+        local alas = part(m, Vector3.new(0.5, 3.4, 3.4), CFrame.new(x, GT + 0.25, z) * CFrame.Angles(0, 0, math.rad(90)), BATU, Enum.Material.Concrete)
+        alas.Shape = Enum.PartType.Cylinder
+        part(m, Vector3.new(0.3, 9.4, 0.3), CFrame.new(x, GT + 4.9, z), PUTIH, Enum.Material.Metal)
+        local pucuk = part(m, Vector3.new(0.4, 0.4, 0.4), CFrame.new(x, GT + 9.75, z), Color3.fromRGB(236, 196, 90), Enum.Material.Metal)
+        pucuk.Shape = Enum.PartType.Ball
+        pucuk.CanCollide = false
+        local merah = part(m, Vector3.new(2.6, 0.8, 0.1), CFrame.new(x + 1.5, GT + 8.9, z), Color3.fromRGB(206, 36, 44), Enum.Material.SmoothPlastic)
+        merah.CanCollide = false
+        local putihBawah = part(m, Vector3.new(2.6, 0.8, 0.1), CFrame.new(x + 1.5, GT + 8.1, z), PUTIH, Enum.Material.SmoothPlastic)
+        putihBawah.CanCollide = false
+end
+
+-- Sepasang kupu-kupu beterbangan mengitari petak bunga.
+local function kupuKupu(parent: Instance, cx: number, cz: number)
+        local m = Instance.new("Model")
+        m.Name = "KupuKupu"
+        m.Parent = parent
+        local warna = { Color3.fromRGB(236, 152, 66), Color3.fromRGB(150, 110, 208) }
+        for i = 1, 2 do
+                local kupu = part(m, Vector3.new(0.55, 0.16, 0.4), CFrame.new(cx, GT + 2.2, cz), warna[i], Enum.Material.SmoothPlastic)
+                kupu.Name = "Kupu"
+                kupu.CanCollide = false
+                local radius = 3.5 + i * 2
+                local laju = 0.9 + i * 0.3
+                local fase = i * 2.1
+                task.spawn(function()
+                        local t = fase
+                        while kupu.Parent do
+                                local dt = RunService.Heartbeat:Wait()
+                                t += dt * laju
+                                kupu.CFrame = CFrame.new(cx + math.cos(t) * radius, GT + 2.2 + math.sin(t * 3) * 0.6, cz + math.sin(t) * radius) * CFrame.Angles(0, -t, 0)
+                        end
+                end)
+        end
+end
+
+-- KAWASAN 1 (barat laut): TAMAN RAKYAT — taman bermain + saung + kolam bebek.
+local function tamanRakyat(parent: Instance)
+        local m = Instance.new("Model")
+        m.Name = "TamanRakyat"
+        m.Parent = parent
+        papanTeks(m, -95, -57, "TAMAN RAKYAT", math.rad(180), 4.5)
+        part(m, Vector3.new(3, 0.2, 33), CFrame.new(-95, GT + 0.1, -38.5), JALAN, Enum.Material.Concrete).Name = "SetapakTaman"
+        ayunan(m, -106, -72, 0)
+        perosotan(m, -88, -72, 0)
+        jungkatJungkit(m, -97, -81, 0)
+        kotakPasir(m, -114, -72)
+        gazebo(m, -78, -98, 8)
+        gazebo(m, -114, -104, 7)
+        kolamBebek(m, -96, -116)
+        part(m, Vector3.new(24, 0.2, 3), CFrame.new(-98, GT + 0.1, -87), JALAN, Enum.Material.Concrete).Name = "SetapakTaman"
+        part(m, Vector3.new(3, 0.2, 21), CFrame.new(-98, GT + 0.1, -97.5), JALAN, Enum.Material.Concrete).Name = "SetapakTaman"
+        bangku(m, -84, -66, 0)
+        bangku(m, -108, -88, math.rad(180))
+        bangku(m, -86, -104, math.rad(-90))
+        lampuTaman(m, -70, -64)
+        lampuTaman(m, -122, -64)
+        lampuTaman(m, -70, -126)
+        lampuTaman(m, -122, -126)
+        pohonAlam(m, -70, -86)
+        pohonAlam(m, -70, -112)
+        pohonAlam(m, -124, -84)
+        pohonAlam(m, -124, -112)
+        pohonAlam(m, -84, -128)
+        bungaLiar(m, -72, -76, 3)
+        bungaLiar(m, -118, -84, 3)
+        bungaLiar(m, -92, -66, 3)
+        bungaLiar(m, -108, -122, 3)
+        bungaLiar(m, -84, -116, 3)
+        semak(m, -72, -60)
+        semak(m, -100, -62)
+        semak(m, -120, -74)
+        semak(m, -70, -100)
+        semak(m, -66, -120)
+        semak(m, -92, -132)
+        semak(m, -116, -128)
+        batuAlam(m, -66, -92, 1.6)
+        batuAlam(m, -126, -100, 2)
+        npc(m, -90, -62, math.rad(135), "Penjaga Taman", Color3.fromRGB(96, 148, 92))
+end
+
+-- KAWASAN 2 (barat daya): LAPANGAN DESA — 2 lapangan bulu tangkis + basket.
+local function lapanganDesa(parent: Instance)
+        local m = Instance.new("Model")
+        m.Name = "LapanganDesa"
+        m.Parent = parent
+        papanTeks(m, -22, 60, "LAPANGAN DESA", 0, 4.5)
+        part(m, Vector3.new(3, 0.2, 68), CFrame.new(-15, GT + 0.1, 31), JALAN, Enum.Material.Concrete).Name = "SetapakLapangan"
+        lapanganBuluTangkis(m, -18, 78, 0)
+        lapanganBuluTangkis(m, -18, 98, 0)
+        lapanganBasket(m, 8, 88, 0)
+        lampuSorot(m, -30, 72, math.rad(-90))
+        lampuSorot(m, -30, 104, math.rad(-90))
+        bangku(m, -18, 66, 0)
+        bangku(m, -26, 78, math.rad(-90))
+        bangku(m, 19, 88, math.rad(90))
+        bangku(m, -18, 110, 0)
+        pohonAlam(m, 24, 70, 1)
+        pohonAlam(m, 24, 110, 0.95)
+        pohonAlam(m, -32, 88, 1.05)
+        pohonAlam(m, -30, 122, 0.9)
+        bungaLiar(m, -26, 70, 3)
+        bungaLiar(m, 14, 74, 3)
+        bungaLiar(m, 16, 104, 3)
+        bungaLiar(m, -36, 66, 3)
+        semak(m, -28, 62)
+        semak(m, -4, 64)
+        semak(m, 18, 66)
+        semak(m, 22, 96)
+        semak(m, -2, 118)
+        semak(m, -36, 116)
+        npc(m, -6, 70, math.rad(90), "Anak Lapangan", Color3.fromRGB(208, 148, 70))
+end
+
+-- KAWASAN 3 (timur laut): KEBUN RAYA — 6 petak bunga + pergola + rumah kaca.
+local function kebunRaya(parent: Instance)
+        local m = Instance.new("Model")
+        m.Name = "KebunRaya"
+        m.Parent = parent
+        papanTeks(m, 79, -55, "KEBUN RAYA", math.rad(-90), 4.5)
+        part(m, Vector3.new(11, 0.2, 3), CFrame.new(69.5, GT + 0.1, -60), JALAN, Enum.Material.Concrete).Name = "SetapakRaya"
+        part(m, Vector3.new(14, 0.2, 3), CFrame.new(82, GT + 0.1, -60), JALAN, Enum.Material.Concrete).Name = "SetapakRaya"
+        part(m, Vector3.new(3, 0.2, 44), CFrame.new(90, GT + 0.1, -86), JALAN, Enum.Material.Concrete).Name = "SetapakRaya"
+        petakBunga(m, 82, -72, 12, 6)
+        petakBunga(m, 98, -72, 12, 6)
+        petakBunga(m, 82, -86, 12, 6)
+        petakBunga(m, 98, -86, 12, 6)
+        petakBunga(m, 82, -100, 12, 6)
+        petakBunga(m, 98, -100, 12, 6)
+        pergola(m, 112, -80, 20, 0)
+        rumahKaca(m, 124, -64)
+        kupuKupu(m, 90, -86)
+        bangku(m, 76, -76, math.rad(90))
+        bangku(m, 106, -94, math.rad(-90))
+        bangku(m, 90, -108, 0)
+        lampuTaman(m, 72, -66)
+        lampuTaman(m, 108, -66)
+        pohonAlam(m, 70, -78, 0.95)
+        pohonAlam(m, 70, -104, 1.05)
+        pohonAlam(m, 114, -112, 1)
+        pohonAlam(m, 128, -92, 0.9)
+        pohonAlam(m, 76, -122, 1.05)
+        bungaLiar(m, 72, -90, 3)
+        bungaLiar(m, 108, -116, 3)
+        bungaLiar(m, 122, -76, 3)
+        bungaLiar(m, 86, -112, 3)
+        semak(m, 72, -64)
+        semak(m, 104, -52)
+        semak(m, 76, -108)
+        semak(m, 118, -104)
+        semak(m, 94, -120)
+        batuAlam(m, 70, -68, 1.4)
+        batuAlam(m, 112, -108, 1.8)
+        npc(m, 78, -66, math.rad(45), "Tukang Kebun", Color3.fromRGB(120, 128, 88))
+end
+
+-- KAWASAN 4 (tenggara): PANGGUNG BUDAYA — panggung + tribun + bendera + sawah mini.
+local function panggungBudaya(parent: Instance)
+        local m = Instance.new("Model")
+        m.Name = "PanggungBudaya"
+        m.Parent = parent
+        papanTeks(m, 66, 70, "PANGGUNG BUDAYA", math.rad(-90), 4.5)
+        part(m, Vector3.new(26, 0.2, 3), CFrame.new(77, GT + 0.1, 75), JALAN, Enum.Material.Concrete).Name = "SetapakPanggung"
+        panggung(m, 92, 75, 0)
+        for _, sz in ipairs({ 84, 90 }) do
+                for _, sx in ipairs({ 86, 92, 98 }) do
+                        bangku(m, sx, sz, math.rad(180))
+                end
+        end
+        benderaMerahPutih(m, 78, 100)
+        gazebo(m, 118, 66, 9)
+        for _, petak in ipairs({ { 98, 110 }, { 112, 110 }, { 98, 122 }, { 112, 122 } }) do
+                local px, pz = petak[1], petak[2]
+                part(m, Vector3.new(11, 0.35, 9), CFrame.new(px, GT + 0.175, pz), TANAH, Enum.Material.Ground)
+                local air = part(m, Vector3.new(9.6, 0.12, 7.6), CFrame.new(px, GT + 0.41, pz), AIR, Enum.Material.Glass, 0.4)
+                air.CanCollide = false
+                tanamanDemo(m, px - 3, pz, "gandum")
+                tanamanDemo(m, px, pz, "gandum")
+                tanamanDemo(m, px + 3, pz, "gandum")
+        end
+        gerobak(m, 108, 90, math.rad(15))
+        lampuTaman(m, 84, 60)
+        lampuTaman(m, 104, 96)
+        pohonAlam(m, 72, 108, 1)
+        pohonAlam(m, 128, 100, 0.95)
+        pohonAlam(m, 76, 134, 1.05)
+        pohonAlam(m, 124, 134, 0.9)
+        bungaLiar(m, 72, 84, 3)
+        bungaLiar(m, 86, 106, 3)
+        bungaLiar(m, 122, 84, 3)
+        bungaLiar(m, 104, 132, 3)
+        semak(m, 70, 62)
+        semak(m, 70, 92)
+        semak(m, 100, 60)
+        semak(m, 130, 76)
+        semak(m, 90, 132)
+        semak(m, 116, 118)
+        batuAlam(m, 70, 118, 1.6)
+        npc(m, 92, 76, math.rad(180), "Seniman Dataran", Color3.fromRGB(150, 96, 120), 1)
+        npc(m, 84, 88, math.rad(90), "Penjual Jajan", Color3.fromRGB(96, 148, 92))
+end
+
 -- Suasana: sore hangat khas kepulauan + awan (aman jika layanan tak ada).
 local function penerangan()
         pcall(function()
@@ -715,13 +1224,16 @@ local function alunAlun(parent: Instance)
         rakSepeda(m, 84, 4, 0)
         -- papan petunjuk arah bertingkat
         papanPetunjuk(m, 33, -23, PLAZA_Y)
-        part(m, Vector3.new(0.5, 9.4, 0.5), CFrame.new(33, PLAZA_Y + 4.7, -6), KAYU_TUA, Enum.Material.Wood)
-        local papanSelamat = part(m, Vector3.new(9, 3, 0.35), CFrame.new(33, PLAZA_Y + 7.9, -6), KAYU, Enum.Material.Wood)
+        -- papan selamat datang dipindah dari z=-6 (dulu tepat di koridor
+        -- jalan Penghubung z -12..-2, tiangnya menghalangi jalan) ke tepi
+        -- barat daya plaza, bebas jalan tetapi tetap terlihat dari spawn
+        part(m, Vector3.new(0.5, 9.4, 0.5), CFrame.new(33, PLAZA_Y + 4.7, -13.5), KAYU_TUA, Enum.Material.Wood)
+        local papanSelamat = part(m, Vector3.new(9, 3, 0.35), CFrame.new(33, PLAZA_Y + 7.9, -13.5), KAYU, Enum.Material.Wood)
         teksPapan(papanSelamat, Enum.NormalId.Front, "SELAMAT DATANG DI DATARAN")
         teksPapan(papanSelamat, Enum.NormalId.Back, "SELAMAT DATANG DI DATARAN")
-        local papanToko = part(m, Vector3.new(7.5, 2.4, 0.35), CFrame.new(33, PLAZA_Y + 4.9, -6), KAYU, Enum.Material.Wood)
-        teksPapan(papanToko, Enum.NormalId.Front, "Toko Benih di Pusat Kota")
-        teksPapan(papanToko, Enum.NormalId.Back, "Toko Benih di Pusat Kota")
+        local papanToko = part(m, Vector3.new(7.5, 2.4, 0.35), CFrame.new(33, PLAZA_Y + 4.9, -13.5), KAYU, Enum.Material.Wood)
+        teksPapan(papanToko, Enum.NormalId.Front, "Toko Benih Dataran")
+        teksPapan(papanToko, Enum.NormalId.Back, "Toko Benih Dataran")
         npc(m, 48, -8, math.rad(45), "Pengelola Alun-alun", Color3.fromRGB(96, 148, 92), PLAZA_Y)
         npc(m, 62, 2, math.rad(135), "Bocah Alun-alun", Color3.fromRGB(208, 148, 70), PLAZA_Y)
 end
@@ -750,7 +1262,7 @@ local function jalurDanGerbang(parent: Instance, hooks)
         -- tebal agar rapi menimpa pertemuan jalan)
         local _, hP, cxP, czP, lenP = jalanAspal(m, -17, -7, 45, -7, { nama = "Penghubung", lebar = 10, tebal = 0.3 })
         hiasJalan(m, hP, cxP, czP, lenP, 10, { { -17, 10 }, { 30, 45 } })
-        -- Jalan pusat kota menuju Toko Benih (berhenti sebelum dinding depan
+        -- Jalan aspal menuju Toko Benih (berhenti sebelum dinding depan
         -- toko di z=-42 supaya aspal tidak menembus bangunan)
         jalanAspal(m, 0, -41.5, 0, -33, { nama = "PusatKota", lebar = 10, tebal = 0.24 })
 
@@ -845,7 +1357,7 @@ end
 -- Titik bunga liar di area rumput (dipilih manual agar tidak menginjak
 -- jalan maupun bangunan).
 local BUNGA_TITIK = {
-        { 24, -32 }, { 20, 2 }, { 26, 6 }, { -14, 30 }, { 16, 26 }, { -16, 12 },
+        { 24, -32 }, { 20, 2 }, { 26, 6 }, { -24, 30 }, { 16, 26 }, { -20, 14 },
         { 72, 40 }, { 66, 56 }, { 42, 30 }, { 38, 52 }, { 44, 70 }, { -56, 22 },
         { -52, 66 }, { 90, 34 }, { 134, 24 }, { 40, -60 }, { 72, -56 },
         { 36, -100 }, { 72, -110 }, { -30, 10 }, { -40, -34 },
@@ -860,6 +1372,19 @@ local POHON_LAWN = {
         { -34, -2, 1 }, { 88, 4, 0.9 }, { 40, -70, 1.05 }, { 38, -110, 0.95 },
         { 70, -70, 1 }, { 75, -120, 0.9 }, { 38, 60, 1.1 }, { 36, 110, 0.95 },
         { 72, 70, 1 }, { 78, 120, 1.05 }, { -30, -32, 0.9 }, { 96, 12, 0.85 },
+        -- pengayaan v71: pohon pelanjang untuk rumput kosong sisa
+        { -60, -60, 1 }, { -140, -60, 1.05 }, { -140, 20, 0.95 },
+        { 90, -160, 1 }, { 120, -150, 0.95 }, { 100, 60, 0.9 },
+        { 30, 140, 1 }, { -20, 150, 1.05 }, { 96, -120, 0.9 }, { 136, 126, 1.05 },
+}
+
+-- Semak bulat penyeimbang rumput kosong di sepanjang jaringan jalan
+local SEMAK_TITIK = {
+        { -22, -30 }, { 12, -30 }, { 42, -28 }, { 92, -28 }, { 122, -30 },
+        { 30, -58 }, { 80, -50 }, { 28, 22 }, { 84, 22 }, { 94, 46 },
+        { 28, 90 }, { 28, 140 }, { 82, 142 }, { -32, -60 }, { -60, -30 },
+        { -60, 8 }, { -6, 66 }, { 0, 96 }, { 40, 100 }, { 40, 130 },
+        { 130, -40 }, { -6, 150 }, { 24, 160 }, { 90, 40 },
 }
 
 function DataranBuilder.build(hooks)
@@ -877,11 +1402,19 @@ function DataranBuilder.build(hooks)
         kebunDemonstrasi(folder)
         perbukitanAlam(folder)
         sungaiJembatan(folder)
+        -- kawasan baru v71: isi 4 lahan kosong besar
+        tamanRakyat(folder)
+        lapanganDesa(folder)
+        kebunRaya(folder)
+        panggungBudaya(folder)
         for _, t in ipairs(BUNGA_TITIK) do
                 bungaLiar(folder, t[1], t[2], 3)
         end
         for _, p in ipairs(POHON_LAWN) do
                 pohonAlam(folder, p[1], p[2], p[3])
+        end
+        for _, s in ipairs(SEMAK_TITIK) do
+                semak(folder, s[1], s[2])
         end
         penerangan()
         return folder

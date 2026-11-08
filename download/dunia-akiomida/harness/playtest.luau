@@ -216,10 +216,21 @@ check("Folder Dataran dibangun saat boot", dataran ~= nil)
 local function dasarTerendah(model)
         local minY = math.huge
         for _, d in ipairs(model:GetDescendants()) do
-                if d:IsA("BasePart") then
-                        local y = d.CFrame.Position.Y - d.Size.Y / 2
-                        if y < minY then
-                                minY = y
+                -- bola dekoratif (batu alam, daun pohon) memang ditanam
+                -- sebagian di tanah: dilewati dari audit tenggelam
+                if d:IsA("BasePart") and d.Shape ~= Enum.PartType.Ball then
+                        -- rotasi diperhitungkan lewat 8 pojok AABB (kakisan
+                        -- naif Position.Y - Size.Y/2 salah untuk part miring
+                        -- seperti cakram air & atap kaca)
+                        local cf, size = d.CFrame, d.Size
+                        for i = 0, 7 do
+                                local lx = ((i % 2 == 0) and -0.5 or 0.5) * size.X
+                                local ly = ((i % 4 < 2) and -0.5 or 0.5) * size.Y
+                                local lz = ((i < 4) and -0.5 or 0.5) * size.Z
+                                local wy = (cf * CFrame.new(lx, ly, lz)).Position.Y
+                                if wy < minY then
+                                        minY = wy
+                                end
                         end
                 end
         end
@@ -287,6 +298,103 @@ check("Rak sepeda (2)", #kumpulkanModel("RakSepeda") == 2, tostring(#kumpulkanMo
 check("Kawanan burung mengitari air mancur", #kumpulkanModel("KawananBurung") == 1)
 local petunjuk = kumpulkanModel("PapanPetunjuk")
 check("Papan petunjuk arah bertingkat (1)", #petunjuk == 1, tostring(#petunjuk))
+
+section("Dataran v71: 4 kawasan baru mengisi lahan kosong")
+local kawasanV71 = { "TamanRakyat", "LapanganDesa", "KebunRaya", "PanggungBudaya" }
+local kawasanAda = 0
+for _, nama in ipairs(kawasanV71) do
+        if dataran and dataran:FindFirstChild(nama, true) then
+                kawasanAda += 1
+        end
+end
+check("4 kawasan baru dibangun (Taman Rakyat, Lapangan Desa, Kebun Raya, Panggung Budaya)", kawasanAda == 4, tostring(kawasanAda))
+
+local fasilitasV71 = { "Ayunan", "Perosotan", "JungkatJungkit", "KotakPasir", "Gazebo", "KolamBebek", "Bebek", "Panggung", "RumahKaca", "Pergola", "LampuSorot", "LapanganBuluTangkis", "LapanganBasket", "BenderaMerahPutih" }
+local fasHitung, fasTenggelam = 0, 0
+for _, nama in ipairs(fasilitasV71) do
+        for _, b in ipairs(kumpulkanModel(nama)) do
+                fasHitung += 1
+                if dasarTerendah(b) < -0.06 then
+                        fasTenggelam += 1
+                end
+        end
+end
+check("Fasilitas kawasan baru lengkap (>= 20 model)", fasHitung >= 20, tostring(fasHitung))
+check("Tidak ada fasilitas baru tenggelam", fasTenggelam == 0, tostring(fasTenggelam) .. " objek terkubur")
+check("NPC Dataran ramai (>= 14, penambahan 4 kawasan)", #kumpulkanModel("NPC ") >= 14, tostring(#kumpulkanModel("NPC ")))
+
+-- perabot di atas slab plaza harus berdiri di lantai plaza, bukan terkubur
+local perabotPlazaTenggelam = 0
+if dataran then
+        for _, n in ipairs({ "BangkuTaman", "LampuTaman", "PapanPetunjuk", "BenderaHias", "NPC " }) do
+                for _, b in ipairs(kumpulkanModel(n)) do
+                        local p = b:GetPivot().Position
+                        if p.X >= 32 and p.X <= 78 and p.Z >= -38 and p.Z <= 8 then
+                                if dasarTerendah(b) < 0.2 then
+                                        perabotPlazaTenggelam += 1
+                                end
+                        end
+                end
+        end
+end
+check("Perabot plaza berdiri di lantai plaza (bukan terkubur beton)", perabotPlazaTenggelam == 0, tostring(perabotPlazaTenggelam) .. " perabot terkubur")
+
+-- koridor aspal 6 jalan bebas penghalang pijakan (anti bangunan di jalan)
+-- catatan: slab plaza alun-alun (x 32..78) adalah apron masuk jalan setinggi
+-- 0.275 stud (bisa dilangkaki) sehingga zona tumpang tindihnya dikecualikan
+local KORIDOR = {
+        { "Barat", -170, 31, -20.8, -9.2 },
+        { "Timur", 79, 172, -20.8, -9.2 },
+        { "Utara", 49.2, 60.8, -172, -37 },
+        { "Selatan", 49.2, 60.8, 6, 172 },
+        { "Penghubung", -17, 31, -11.8, -2.2 },
+        { "PusatKota", -4.8, 4.8, -41.5, -33 },
+}
+local IJIN_NAMA = { JalanAspal = true, MarkaPutih = true, ZebraCross = true, JalurSepeda = true, Trotoar = true, PagarJembatan = true, TiangJembatan = true }
+local function beriIjinModel(d)
+        local p = d.Parent
+        while p and p ~= dataran do
+                local nm = p.Name
+                if string.sub(nm, 1, 7) == "Gerbang" or nm == "RakSepeda" or nm == "Sepeda" then
+                        return true
+                end
+                p = p.Parent
+        end
+        return false
+end
+local penghalang = {}
+if dataran then
+        for _, d in ipairs(dataran:GetDescendants()) do
+                if d:IsA("BasePart") and not IJIN_NAMA[d.Name] and not beriIjinModel(d) then
+                        local atas = d.Position.Y + d.Size.Y / 2
+                        local bawah = d.Position.Y - d.Size.Y / 2
+                        if d.CanCollide and atas > 0.22 and bawah < 1.5 then
+                                local px, pz = d.Position.X, d.Position.Z
+                                for _, k in ipairs(KORIDOR) do
+                                        if px >= k[2] and px <= k[3] and pz >= k[4] and pz <= k[5] then
+                                                table.insert(penghalang, k[1] .. ":" .. d.Name)
+                                                break
+                                        end
+                                end
+                        end
+                end
+        end
+end
+check("Koridor 6 jalan aspal bebas penghalang pijakan", #penghalang == 0, table.concat(penghalang, ", "))
+
+-- anti z-fighting: permukaan aspal tidak boleh koplanar dengan path hub (0.2)
+local koplanar = 0
+if dataran then
+        for _, d in ipairs(dataran:GetDescendants()) do
+                if d:IsA("BasePart") and d.Name == "JalanAspal" then
+                        local atas = d.Position.Y + d.Size.Y / 2
+                        if math.abs(atas - 0.24) > 0.005 and math.abs(atas - 0.3) > 0.005 then
+                                koplanar += 1
+                        end
+                end
+        end
+end
+check("Jalan aspal tidak koplanar path hub (anti z-fight)", koplanar == 0, tostring(koplanar) .. " segmen koplanar")
 
 local teksTerlarang = {}
 if dunia then
