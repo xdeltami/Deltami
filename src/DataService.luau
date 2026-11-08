@@ -42,7 +42,7 @@ local function muatData(player)
 		data.Micda = GameConfig.MicdaMaks
 	end
 	dataPemain[player.UserId] = data
-	Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Selamat datang di Dataran! " .. GameConfig.FormatMicda(data.Micda) .. " Micda sudah terisi di akunmu."})
+	Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Selamat datang di " .. GameConfig.TempatIni .. "! " .. GameConfig.FormatMicda(data.Micda) .. " Micda sudah terisi di akunmu."})
 	DataService.KirimData(player)
 end
 

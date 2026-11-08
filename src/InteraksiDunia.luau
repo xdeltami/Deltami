@@ -21,10 +21,10 @@ local sapaan = {
 }
 
 local infoGerbang = {
-	GerbangKampung = "Gerbang Barat menuju Kampung. Kawasan tujuan akan dibuka pada place berikutnya.",
-	GerbangSabana = "Gerbang Utara menuju Sabana. Kawasan tujuan akan dibuka pada place berikutnya.",
-	GerbangStepa = "Gerbang Timur menuju Stepa. Kawasan tujuan akan dibuka pada place berikutnya.",
-	GerbangPerladangan = "Gerbang Selatan menuju Perladangan. Kawasan tujuan akan dibuka pada place berikutnya.",
+	GerbangKampung = "Gerbang Barat menuju Kampung. Pilih 'Masuk Gerbang' pada papan untuk teleport ke kawasan itu.",
+	GerbangSabana = "Gerbang Utara menuju Sabana. Pilih 'Masuk Gerbang' pada papan untuk teleport ke kawasan itu.",
+	GerbangStepa = "Gerbang Timur menuju Stepa. Pilih 'Masuk Gerbang' pada papan untuk teleport ke kawasan itu.",
+	GerbangPerladangan = "Gerbang Selatan menuju Perladangan. Pilih 'Masuk Gerbang' pada papan untuk teleport ke kawasan itu.",
 }
 
 local function tambahPrompt(induk, aksi, objek)

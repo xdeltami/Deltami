@@ -1,6 +1,17 @@
 local GameConfig = {}
 
-GameConfig.NamaPlace = "Dataran"
+GameConfig.TempatIni = "@@TEMPAT@@"
+GameConfig.Places = {
+	Dataran = 77626159664192,
+	Kampung = 104140882721739,
+	Sabana = 114149183491762,
+	Stepa = 121892136503729,
+	Perladangan = 74900687715969,
+}
+GameConfig.PesanKawasan = "@@PESAN_KAWASAN@@"
+GameConfig.NPCTeks = @@NPCTEKS@@
+
+GameConfig.NamaPlace = "@@TEMPAT@@"
 GameConfig.MataUang = "Micda"
 GameConfig.MicdaAwal = 999990000000000
 GameConfig.MicdaMaks = 1000000000000000

@@ -16330,7 +16330,7 @@ end
         </Item>
         <Item class="Part" referent="RBX920">
           <Properties>
-            <string name="Name">PapanSegera</string>
+            <string name="Name">PapanBuka</string>
             <bool name="Anchored">true</bool>
             <bool name="CanCollide">true</bool>
             <float name="Transparency">0</float>
@@ -16362,7 +16362,7 @@ end
                 <bool name="TextScaled">true</bool>
                 <bool name="TextWrapped">true</bool>
                 <token name="Font">4</token>
-                <string name="Text">SEGERA DIBUKA</string>
+                <string name="Text">GERBANG AKTIF - MASUK UNTUK TELEPORT</string>
               </Properties>
             </Item>
           </Item>
@@ -16699,7 +16699,7 @@ end
         </Item>
         <Item class="Part" referent="RBX943">
           <Properties>
-            <string name="Name">PapanSegera</string>
+            <string name="Name">PapanBuka</string>
             <bool name="Anchored">true</bool>
             <bool name="CanCollide">true</bool>
             <float name="Transparency">0</float>
@@ -16731,7 +16731,7 @@ end
                 <bool name="TextScaled">true</bool>
                 <bool name="TextWrapped">true</bool>
                 <token name="Font">4</token>
-                <string name="Text">SEGERA DIBUKA</string>
+                <string name="Text">GERBANG AKTIF - MASUK UNTUK TELEPORT</string>
               </Properties>
             </Item>
           </Item>
@@ -16973,7 +16973,7 @@ end
         </Item>
         <Item class="Part" referent="RBX961">
           <Properties>
-            <string name="Name">PapanSegera</string>
+            <string name="Name">PapanBuka</string>
             <bool name="Anchored">true</bool>
             <bool name="CanCollide">true</bool>
             <float name="Transparency">0</float>
@@ -17005,7 +17005,7 @@ end
                 <bool name="TextScaled">true</bool>
                 <bool name="TextWrapped">true</bool>
                 <token name="Font">4</token>
-                <string name="Text">SEGERA DIBUKA</string>
+                <string name="Text">GERBANG AKTIF - MASUK UNTUK TELEPORT</string>
               </Properties>
             </Item>
           </Item>
@@ -17247,7 +17247,7 @@ end
         </Item>
         <Item class="Part" referent="RBX979">
           <Properties>
-            <string name="Name">PapanSegera</string>
+            <string name="Name">PapanBuka</string>
             <bool name="Anchored">true</bool>
             <bool name="CanCollide">true</bool>
             <float name="Transparency">0</float>
@@ -17279,7 +17279,7 @@ end
                 <bool name="TextScaled">true</bool>
                 <bool name="TextWrapped">true</bool>
                 <token name="Font">4</token>
-                <string name="Text">SEGERA DIBUKA</string>
+                <string name="Text">GERBANG AKTIF - MASUK UNTUK TELEPORT</string>
               </Properties>
             </Item>
           </Item>
@@ -17975,6 +17975,17 @@ end
         <string name="Name">GameConfig</string>
         <ProtectedString name="Source">local GameConfig = {}
 
+GameConfig.TempatIni = "Dataran"
+GameConfig.Places = {
+	Dataran = 77626159664192,
+	Kampung = 104140882721739,
+	Sabana = 114149183491762,
+	Stepa = 121892136503729,
+	Perladangan = 74900687715969,
+}
+GameConfig.PesanKawasan = "Selamat datang di Dataran! Toko Benih di barat, kebun demonstrasi di timur, empat gerbang di utara, timur, selatan, dan barat."
+GameConfig.NPCTeks = {}
+
 GameConfig.NamaPlace = "Dataran"
 GameConfig.MataUang = "Micda"
 GameConfig.MicdaAwal = 999990000000000
@@ -18221,7 +18232,7 @@ local function muatData(player)
 		data.Micda = GameConfig.MicdaMaks
 	end
 	dataPemain[player.UserId] = data
-	Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Selamat datang di Dataran! " .. GameConfig.FormatMicda(data.Micda) .. " Micda sudah terisi di akunmu."})
+	Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Selamat datang di " .. GameConfig.TempatIni .. "! " .. GameConfig.FormatMicda(data.Micda) .. " Micda sudah terisi di akunmu."})
 	DataService.KirimData(player)
 end
 
@@ -18357,6 +18368,82 @@ return DataService
     </Item>
     <Item class="Script" referent="RBX1030">
       <Properties>
+        <string name="Name">GerbangTeleport</string>
+        <ProtectedString name="Source">local TeleportService = game:GetService("TeleportService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local GameConfig = require(ReplicatedStorage:WaitForChild("GameConfig"))
+local Remotes = require(ReplicatedStorage:WaitForChild("Remotes"))
+local RateLimit = require(script.Parent:WaitForChild("RateLimit"))
+
+local cooldown = {}
+
+local function tujuanDari(namaGerbang)
+	local target = string.gsub(namaGerbang, "^Gerbang", "")
+	if target == GameConfig.TempatIni then
+		return nil
+	end
+	local id = GameConfig.Places[target]
+	if id and id ~= GameConfig.Places[GameConfig.TempatIni] then
+		return id, target
+	end
+	return nil
+end
+
+task.spawn(function()
+	local folderGerbang = workspace:WaitForChild("Gerbang", 60)
+	if not folderGerbang then
+		return
+	end
+	for _, gerbang in ipairs(folderGerbang:GetChildren()) do
+		local id, nama = tujuanDari(gerbang.Name)
+		local papan = gerbang:FindFirstChild("PapanGerbang", true)
+		if id and papan then
+			local prompt = Instance.new("ProximityPrompt")
+			prompt.Name = "PromptTeleport"
+			prompt.ActionText = "Masuk Gerbang"
+			prompt.ObjectText = "Menuju " .. nama
+			prompt.HoldDuration = 0.5
+			prompt.MaxActivationDistance = 14
+			prompt.RequiresLineOfSight = false
+			prompt.Parent = papan
+			prompt.Triggered:Connect(function(player)
+				if not RateLimit.Izinkan(player, "Teleport", 2) then
+					return
+				end
+				local sekarang = os.clock()
+				if cooldown[player.UserId] and sekarang - cooldown[player.UserId] &lt; 4 then
+					return
+				end
+				cooldown[player.UserId] = sekarang
+				Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Gerbang terbuka... menuju " .. nama .. "!"})
+				local ok, err = pcall(function()
+					TeleportService:TeleportAsync(id, {player})
+				end)
+				if not ok then
+					Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Gerbang gagal membuka, coba lagi. (" .. tostring(err) .. ")"})
+				end
+			end)
+		end
+	end
+end)
+
+TeleportService.TeleportInitFailed:Connect(function(player, _, hasil)
+	if player.Parent then
+		Remotes.InfoDataran:FireClient(player, {Jenis = "Pesan", Teks = "Teleport gagal (" .. tostring(hasil) .. "), coba masuk gerbang lagi."})
+	end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	cooldown[player.UserId] = nil
+end)
+</ProtectedString>
+        <bool name="Disabled">false</bool>
+      </Properties>
+    </Item>
+    <Item class="Script" referent="RBX1031">
+      <Properties>
         <string name="Name">TokoBenihService</string>
         <ProtectedString name="Source">local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -18412,7 +18499,7 @@ end)
         <bool name="Disabled">false</bool>
       </Properties>
     </Item>
-    <Item class="Script" referent="RBX1031">
+    <Item class="Script" referent="RBX1032">
       <Properties>
         <string name="Name">KebunDemoService</string>
         <ProtectedString name="Source">local Players = game:GetService("Players")
@@ -18620,7 +18707,7 @@ end)
         <bool name="Disabled">false</bool>
       </Properties>
     </Item>
-    <Item class="Script" referent="RBX1032">
+    <Item class="Script" referent="RBX1033">
       <Properties>
         <string name="Name">InteraksiDunia</string>
         <ProtectedString name="Source">local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -18646,10 +18733,10 @@ local sapaan = {
 }
 
 local infoGerbang = {
-	GerbangKampung = "Gerbang Barat menuju Kampung. Kawasan tujuan akan dibuka pada place berikutnya.",
-	GerbangSabana = "Gerbang Utara menuju Sabana. Kawasan tujuan akan dibuka pada place berikutnya.",
-	GerbangStepa = "Gerbang Timur menuju Stepa. Kawasan tujuan akan dibuka pada place berikutnya.",
-	GerbangPerladangan = "Gerbang Selatan menuju Perladangan. Kawasan tujuan akan dibuka pada place berikutnya.",
+	GerbangKampung = "Gerbang Barat menuju Kampung. Pilih 'Masuk Gerbang' pada papan untuk teleport ke kawasan itu.",
+	GerbangSabana = "Gerbang Utara menuju Sabana. Pilih 'Masuk Gerbang' pada papan untuk teleport ke kawasan itu.",
+	GerbangStepa = "Gerbang Timur menuju Stepa. Pilih 'Masuk Gerbang' pada papan untuk teleport ke kawasan itu.",
+	GerbangPerladangan = "Gerbang Selatan menuju Perladangan. Pilih 'Masuk Gerbang' pada papan untuk teleport ke kawasan itu.",
 }
 
 local function tambahPrompt(induk, aksi, objek)
@@ -18711,11 +18798,11 @@ end)
       </Properties>
     </Item>
   </Item>
-  <Item class="StarterGui" referent="RBX1033">
+  <Item class="StarterGui" referent="RBX1034">
     <Properties>
       <string name="Name">StarterGui</string>
     </Properties>
-    <Item class="LocalScript" referent="RBX1034">
+    <Item class="LocalScript" referent="RBX1035">
       <Properties>
         <string name="Name">DataranClient</string>
         <ProtectedString name="Source">local Players = game:GetService("Players")
