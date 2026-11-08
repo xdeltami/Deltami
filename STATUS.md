@@ -57,6 +57,19 @@ script di atas**. Kunci disimpan lokal di `~/my-project/.secrets/akiomida.env`
   kunci lama: console Active tetapi JWT dalam salinan kedaluwarsa (8 varian kunci
   diuji; body publish sudah benar octet-stream polos).
 - Backup GitHub: commit `af240c3` (deliverable) + `0cf65bc` (generator) dan seterusnya.
+- **v4 "Dataran Hidup" (8 Nov 2026, arahan pemilik: "perindah dataran, isi lahan kosong,
+  fokus tampilan & arsitektur")**: modul baru `scripts-generasi/world_dataran_v4.py` menambah
+  7 kawasan lolos sistem okupansi — Taman Mandala (barat laut), Pasar Dusun (timur, 6 kios +
+  gapura), Kebun Buah (timur laut, pagar batu + gubuk penjaga), Danau Tenang (barat daya,
+  bak batu 27 m + teratai + dek + pergola, tersambung Jalan Tepi Barat-Daya dari jembatan),
+  Panggung Dataran (tenggara, pelataran bundar + panggung berkanopi + busur bangku),
+  Jalur Gerbang (pohon penembang + batu granit antar-gerbang), Sentuh Kenyamanan (pot bunga,
+  bangku). Jalan baru: JalanTaman, JalanPasar, JalanKebunBuah, JalanTepiBaratDaya,
+  JalanDanau, JalanPanggung. Papan info padang + pesan kedatangan diperbarui.
+  Part 1.073 -> 1.496, instance 1.698. Build + validasi LOLOS.
+  **Publish DITOLAK: kunci 8 Nov 15:06 UTC tanpa scope place ("Scope not authorized") —
+  perlu kunci baru ber-scope `universe.place:write`, lalu publish_roblox.sh, atau buka
+  Dataran.rbxlx di Studio > Publish to Roblox.**
 
 ## 6. Kredensial yang Diperlukan
 
