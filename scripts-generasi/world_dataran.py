@@ -518,7 +518,7 @@ def build_padang():
     tempat(-20, -30, 5)
     papan = []
     papan_tanda(papan, -24, -14, 270,
-                "PAPAN INFORMASI PADANG DATARAN\nPadang civic terbuka di pusat Dataran.\nToko Benih lewat gerbang barat - Kebun Demonstrasi lewat gerbang timur.\nDusun di timur laut; sungai, jembatan, dan dermaga di selatan.\nGerbang kawasan: Kampung, Sabana, Stepa, Perladangan.",
+                "PAPAN INFORMASI PADANG DATARAN\nPadang civic terbuka di pusat Dataran.\nToko Benih lewat gerbang barat - Kebun Demonstrasi lewat gerbang timur.\nDusun di timur laut; pasar dusun, kebun buah, dan panggung di timur.\nTaman Mandala di barat laut; Danau Tenang di barat daya.\nGerbang kawasan: Kampung, Sabana, Stepa, Perladangan.",
                 lebar=14, tinggi=4.5, nama="PapanInfo")
     for item in papan:
         items.append(item)
@@ -907,14 +907,14 @@ def build_tata_hijau():
 ANIMASI_KINCIR = """local pusat = script.Parent:WaitForChild("PusatBaling")
 local sudut = 0
 while true do
-	task.wait(0.06)
-	sudut += 0.04
-	for i = 1, 4 do
-		local baling = script.Parent:FindFirstChild("Baling" .. i)
-		if baling then
-			baling.CFrame = pusat.CFrame * CFrame.Angles(0, 0, sudut + (i - 1) * math.pi / 2) * CFrame.new(0, 6, 0)
-		end
-	end
+        task.wait(0.06)
+        sudut += 0.04
+        for i = 1, 4 do
+                local baling = script.Parent:FindFirstChild("Baling" .. i)
+                if baling then
+                        baling.CFrame = pusat.CFrame * CFrame.Angles(0, 0, sudut + (i - 1) * math.pi / 2) * CFrame.new(0, 6, 0)
+                end
+        end
 end
 """
 
@@ -1076,6 +1076,11 @@ def build_world():
         alam.add(item)
     workspace.add(alam)
     workspace.add(build_dekorasi())
+    from world_dataran_v4 import build_semua_tambahan
+    pengayaan = folder("PengayaanV4")
+    for m in build_semua_tambahan():
+        pengayaan.add(m)
+    workspace.add(pengayaan)
     workspace.add(gerbang)
     workspace.add(build_npc())
     return workspace

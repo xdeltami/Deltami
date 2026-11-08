@@ -36,7 +36,7 @@ NPCTEKS = {
 }
 
 PESAN_KAWASAN = {
-    "Dataran": "Selamat datang di Dataran! Toko Benih di barat, kebun demonstrasi di timur, empat gerbang di utara, timur, selatan, dan barat.",
+    "Dataran": "Selamat datang di Dataran! Toko Benih di barat, kebun demonstrasi di timur, empat gerbang di utara, timur, selatan, dan barat. Kawasan baru: Pasar Dusun dan Kebun Buah di timur, Taman Mandala di barat laut, Danau Tenang di barat daya, Panggung Dataran di tenggara.",
     "Kampung": "KAMPUNG AKIOMIDA - hamparan awal kawasan; detailnya belum ditentukan. Gerbang di utara kembali ke Dataran.",
     "Sabana": "SABANA AKIOMIDA - hamparan awal kawasan; detailnya belum ditentukan. Gerbang di utara kembali ke Dataran.",
     "Stepa": "STEPA AKIOMIDA - hamparan awal kawasan; detailnya belum ditentukan. Gerbang di utara kembali ke Dataran.",
