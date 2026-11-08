@@ -17,9 +17,9 @@ end
 
 print("=== TES DUNIA AKIOMIDA - DUNIA SAMBUNG SATU SERVER ===")
 
-print("--- Data tanaman (34) ---")
+print("--- Data tanaman (56) ---")
 do
-        check("Jumlah tanaman = 34", #CropData.Crops == 34, tostring(#CropData.Crops))
+        check("Jumlah tanaman = 56", #CropData.Crops == 56, tostring(#CropData.Crops))
         local counts = { common = 0, rare = 0, epic = 0 }
         local unique = true
         local ids = {}
@@ -31,7 +31,7 @@ do
                 counts[c.rarity] = (counts[c.rarity] or 0) + 1
         end
         check("ID tanaman unik", unique, "-")
-        check("Common = 12", counts.common == 12, tostring(counts.common))
+        check("Common = 34", counts.common == 34, tostring(counts.common))
         check("Rare = 14", counts.rare == 14, tostring(counts.rare))
         check("Epic = 8", counts.epic == 8, tostring(counts.epic))
 
@@ -53,15 +53,57 @@ do
                         table.insert(salah, id .. "=" .. tostring(c.jual))
                 end
         end
-        check("Harga jual 34 tanaman sesuai daftar", #salah == 0, table.concat(salah, ", "))
+        check("Harga jual 34 tanaman inti sesuai daftar", #salah == 0, table.concat(salah, ", "))
 
         local byRarityOk = true
         for _, r in ipairs({ "common", "rare", "epic" }) do
-                if #CropData.byRarity(r) ~= ({ common = 12, rare = 14, epic = 8 })[r] then
+                if #CropData.byRarity(r) ~= ({ common = 34, rare = 14, epic = 8 })[r] then
                         byRarityOk = false
                 end
         end
         check("byRarity benar", byRarityOk, "-")
+end
+
+print("--- Toko Benih Dataran (GDD Place 01) ---")
+do
+        check("Katalog toko = 30 benih", CropData.totalTokoBenih() == 30, tostring(CropData.totalTokoBenih()))
+        local jumlahKat = 0
+        for _ in pairs(CropData.TokoBenih) do
+                jumlahKat += 1
+        end
+        check("Kategori katalog = 5", jumlahKat == 5, tostring(jumlahKat))
+        local perKat = { Serealia = 7, Legum = 5, Sayuran = 9, ["Buah-buahan"] = 8, ["Tanaman Lainnya"] = 1 }
+        local salahKat = {}
+        for kat, n in pairs(perKat) do
+                local daftar = CropData.TokoBenih[kat]
+                if not daftar or #daftar ~= n then
+                        table.insert(salahKat, kat)
+                end
+        end
+        check("Isi tiap kategori sesuai GDD", #salahKat == 0, table.concat(salahKat, ","))
+        check("Urutan kategori sesuai GDD", #CropData.TokoBenihUrutan == 5 and CropData.TokoBenihUrutan[1] == "Serealia" and CropData.TokoBenihUrutan[5] == "Tanaman Lainnya", "-")
+        local lihat, salah = {}, {}
+        for _, daftar in pairs(CropData.TokoBenih) do
+                for _, id in ipairs(daftar) do
+                        if lihat[id] then
+                                table.insert(salah, id .. " ganda")
+                        end
+                        lihat[id] = true
+                        local c = CropData.byId[id]
+                        if not c then
+                                table.insert(salah, id .. " tidak ada")
+                        elseif not CropData.diTokoBenih[id] then
+                                table.insert(salah, id .. " tak terdaftar")
+                        elseif c.tumbuh ~= 1 then
+                                table.insert(salah, id .. " tumbuh=" .. tostring(c.tumbuh))
+                        elseif not CropData.Bentuk[id] then
+                                table.insert(salah, id .. " tanpa bentuk")
+                        end
+                end
+        end
+        check("30 benih unik, terdaftar, tumbuh 1 detik, ada bentuk", #salah == 0, table.concat(salah, ", "))
+        check("Harga benih toko = 1 koin", CropData.HargaBenihDataran == 1, tostring(CropData.HargaBenihDataran))
+        check("Toko hanya benih, tanpa block/material", CropData.diTokoBenih["papan"] == nil and CropData.diTokoBenih["kayu"] == nil, "-")
 end
 
 print("--- Sistem inti ---")
@@ -278,9 +320,9 @@ do
                         table.insert(sama, c.id)
                 end
         end
-        check("34 tanaman semua punya bentuk", #kurang == 0, table.concat(kurang, ", "))
+        check("Semua 56 tanaman punya bentuk", #kurang == 0, table.concat(kurang, ", "))
         check("Jenis bentuk valid & ukuran masuk akal", #rusak == 0, table.concat(rusak, ", "))
-        check("Warna tumbuh beda dari warna siap (34)", #sama == 0, table.concat(sama, ", "))
+        check("Warna tumbuh beda dari warna siap (56)", #sama == 0, table.concat(sama, ", "))
         check("Hybrid punya bentuk sendiri", (function()
                 local ids = { tangelo = true, plumcot = true, nectaplum = true, kacang_tanah = true, pluerry = true, canola = true, triticale = true, tetsukabuto = true }
                 for id in pairs(ids) do
@@ -512,8 +554,8 @@ do
                         table.insert(warnaSalah, c.id)
                 end
         end
-        check("34 tanaman punya spesifikasi drop", #kurang == 0, table.concat(kurang, ", "))
-        check("Warna drop = warna siap tanaman (34)", #warnaSalah == 0, table.concat(warnaSalah, ", "))
+        check("Semua 56 tanaman punya spesifikasi drop", #kurang == 0, table.concat(kurang, ", "))
+        check("Warna drop = warna siap tanaman (56)", #warnaSalah == 0, table.concat(warnaSalah, ", "))
         check("8 hibrida punya drop sendiri", (function()
                 for _, id in ipairs({ "tangelo", "plumcot", "nectaplum", "kacang_tanah", "pluerry", "canola", "triticale", "tetsukabuto" }) do
                         if not DropBentuk.spesifikasi(CropData.Bentuk[id]) then

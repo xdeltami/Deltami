@@ -1,4 +1,5 @@
 local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local UangLogic = require(ReplicatedStorage.Shared.UangLogic)
@@ -20,7 +21,15 @@ local TanamService = require(Modules.TanamService)
 local GudangService = require(Modules.GudangService)
 local DropService = require(Modules.DropService)
 local WorldBuilder = require(Modules.WorldBuilder)
+local DataranBuilder = require(Modules.DataranBuilder)
 local TradeService = require(Modules.TradeService)
+
+local PLACE_KAWASAN = {
+        kampung = 104140882721739,
+        sabana = 114149183491762,
+        stepa = 121892136503729,
+        perladangan = 74900687715969,
+}
 
 Net.init()
 
@@ -119,6 +128,23 @@ local hooks = {
         onGerbangDunia = function(player: Player)
                 Net.get("OpenPanel"):FireClient(player, "gerbang", {})
         end,
+        onGerbangKawasan = function(player: Player, kode: any)
+                if type(kode) ~= "string" or not PLACE_KAWASAN[kode] then
+                        return
+                end
+                if not RateLimit.allow(player.UserId, "gerbang", 3, 6) then
+                        notify(player, "Gerbang", "Tunggu sebentar lagi, ya.")
+                        return
+                end
+                local opsi = Instance.new("TeleportOptions")
+                local ok, err = pcall(function()
+                        TeleportService:TeleportAsync(PLACE_KAWASAN[kode], { player }, opsi)
+                end)
+                if not ok then
+                        AuditService.catat(player, "argumen", "teleport:" .. kode .. ":" .. tostring(err))
+                        notify(player, "Gerbang", "Gerbang kawasan belum siap. Coba lagi nanti.")
+                end
+        end,
         onPulang = function(player: Player)
                 ZonaService.pulang(player)
         end,
@@ -139,6 +165,7 @@ DataService.setZoneProvider(ZonaService.zoneOf)
 DataService.setLahanProvider(LandService.landOf)
 
 WorldBuilder.buildHub(hooks)
+DataranBuilder.build(hooks)
 
 local function applySpawn(player: Player)
         local target = LandService.kotaSpawn() or LandService.umumSpawn()
@@ -364,6 +391,10 @@ Net.get("ShopAct").OnServerInvoke = function(player, action, a, b)
         if action == "buy" then
                 return denganTransaksi(player, function()
                         return ShopService.buy(player, a)
+                end)
+        elseif action == "benih" then
+                return denganTransaksi(player, function()
+                        return ShopService.buyBenih(player, a)
                 end)
         elseif action == "sell" then
                 return denganTransaksi(player, function()

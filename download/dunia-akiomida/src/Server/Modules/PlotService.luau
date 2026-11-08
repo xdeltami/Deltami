@@ -228,7 +228,7 @@ function PlotService.fillPlot(index: number, idx: number, cropId: string): boole
         end
         pl[idx] = {
                 crop = cropId,
-                readyAt = now() + CropData.GrowTime,
+                readyAt = now() + (CropData.byId[cropId].tumbuh or CropData.GrowTime),
                 model = pasangModel(index, idx, cropId),
                 ready = false,
                 hits = 0,

@@ -1,8 +1,40 @@
 # DUNIA AKIOMIDA (Roblox)
 
-Status: LIVE di Roblox (**versionNumber 63**, 7 Nov 2026) — **TRADE ANTAR PEMAIN SERVER-AUTHORITATIVE + SALDO AWAL 999,99 T DIKEMBALIKAN (regresi #57 dibunuh) + KUNCI EKONOMI SAAT TRADE**
-BARU 999,99 T + HUD SINGKATAN INDONESIA + ANTI-CHEAT
-EKONOMI: TANPA BATAS ANGKA TETAP, DETEKSI ANOMALI, KICK AMAN-DATA**:
+Status: LIVE di Roblox (**versionNumber 69**, 8 Nov 2026) — **DATARAN SESUAI GDD PLACE 01: TOKO BENIH 30 BENIH (1 KOIN, TUMBUH 1 DETIK) + ALUN-ALUN + PERMUKIMAN + KEBUN DEMO + PERBUKITAN + 4 GERBANG KAWASAN**
+
+BARU v69 — DATARAN (mandat pemilik: benahi Dataran, bukan membuat tampilan lain):
+
+1. **TOKO BENIH DATARAN SESUAI GDD** — katalog tepat 30 benih (Serealia 7,
+   Legum 5, Sayuran 9, Buah-buahan 8, Tanaman Lainnya 1); semua harga
+   **1 koin (Micda)**; semua **tumbuh 1 detik**; toko TIDAK menjual
+   block/material bangunan. UI kasir menampilkan katalog per kategori
+   (nama, harga, waktu tumbuh, tombol Beli). Pembelian divalidasi server:
+   jarak kasir ≤ 45, saldo cukup, ruang tas cukup, sumber uang beli_benih.
+2. **22 TANAMAN BARU LENGKAP** — jelai, oat, jewawut, buckwheat, kacang
+   polong/lentil/arab/hitam/merah, bit, asparagus, seledri, selada, kembang
+   kol, kubis, paprika, mentimun, apel, pir, anggur, persik, zaitun: semua
+   punya Bentuk + spesifikasi drop otomatis. Waktu tumbuh kini per-tanaman
+   (katalog GDD = 1 detik; tanaman inti tetap 3 detik).
+3. **ALUN-ALUN DATARAN** — plaza dengan air mancur, 4 bangku, 4 lampu
+   taman, papan penunjuk 4 arah (Kampung Barat, Sabana Utara, Stepa Timur,
+   Perladangan Selatan), papan selamat datang, NPC pengelola.
+4. **PERMUKIMAN** — 4 rumah pedesaan beratap pelana dengan pintu, jendela,
+   pagar halaman, petak kebun kecil, 2 NPC warga.
+5. **KEBUN DEMONSTRASI** — 5 petak contoh per kategori katalog berisi
+   tanaman contoh nyata dari data Bentuk.
+6. **PERBUKITAN ALAM** — 3 bukit, pohon alam, batu, **kincir angin
+   berputar** (animasi server), sumur, gerobak.
+7. **SUNGAI KECIL + JEMBATAN KAYU** di jalur timur menuju Stepa.
+8. **4 GERBANG KAWASAN + TELEPORT** — Kampung (Barat), Sabana (Utara),
+   Stepa (Timur), Perladangan (Selatan): tiap gerbang beridentitas visual
+   beda + papan nama; prompt "Menuju <kawasan>" melakukan teleport via
+   TeleportService ke place masing-masing (ID sesuai daftar pemilik),
+   dengan rate-limit, pcall, dan pesan ramah bila belum siap. Gerbang
+   kembali ke Dataran di 4 place itu disiapkan saat place digarap.
+9. **MUTU** — 421 tes PASS 0 FAIL (termasuk seksi baru "Toko Benih Dataran
+   (GDD Place 01)"); luau-lsp analyze 0 error.
+
+### Rilis sebelumnya (v63, 7 Nov 2026) — TRADE ANTAR PEMAIN + SALDO 999,99 T + ANTI-CHEAT:
 
 1. **AKAR KICK 267 DITEMUKAN & DIBUNUH** — AuditService lama menghitung
    SEMUA penolakan (uang ditolak, laju, argumen, jarak, milik, klaim

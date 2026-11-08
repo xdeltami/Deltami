@@ -951,8 +951,34 @@ end)
 local function refreshToko()
         bersihkan(tokoSell)
         local order = 0
+        order += 1
+        mk("TextLabel", { Size = UDim2.new(1, -8, 0, 26), BackgroundTransparency = 1, Text = "KATALOG TOKO BENIH DATARAN (" .. tostring(CropData.totalTokoBenih()) .. " benih · 1 Micda · tumbuh 1 detik)", TextSize = UIStyle.UkuranKecil, Font = FONTB, TextColor3 = warna(UIStyle.Aksen), TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = order }, tokoSell)
+        for _, kat in ipairs(CropData.TokoBenihUrutan) do
+                order += 1
+                mk("TextLabel", { Size = UDim2.new(1, -8, 0, 22), BackgroundTransparency = 1, Text = kat, TextSize = UIStyle.UkuranKecil, Font = FON, TextColor3 = warna(UIStyle.Abu), TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = order }, tokoSell)
+                for _, id in ipairs(CropData.TokoBenih[kat]) do
+                        local info = CropData.byId[id]
+                        if info then
+                                order += 1
+                                local holder = actionBtn(tokoSell, info.nama .. " — 1 Micda · tumbuh 1 detik", order)
+                                subBtn(holder, "Beli", 0, 0.26, warna(UIStyle.Hijau), function()
+                                        task.spawn(function()
+                                                local ok, msg = Net.get("ShopAct"):InvokeServer("benih", id)
+                                                toast(ok and "Dibeli" or "Gagal", msg)
+                                                if ok then
+                                                        syncState()
+                                                end
+                                        end)
+                                end)
+                        end
+                end
+        end
+        order += 1
+        mk("TextLabel", { Size = UDim2.new(1, -8, 0, 26), BackgroundTransparency = 1, Text = "JUAL HASIL PANEN", TextSize = UIStyle.UkuranKecil, Font = FONTB, TextColor3 = warna(UIStyle.Aksen), TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = order }, tokoSell)
+        local jumlahJual = 0
         for _, s in ipairs(TasLogic.ringkas(state.tas, "hasil")) do
                 order += 1
+                jumlahJual += 1
                 local info = CropData.byId[s.id]
                 local holder = actionBtn(tokoSell, (info and info.nama or s.id) .. " x" .. s.count .. " — " .. (info and info.jual or 0) .. " Micda/unit", order)
                 subBtn(holder, "Atur Jual", 0, 0.34, warna(UIStyle.Hijau), function()
@@ -962,8 +988,8 @@ local function refreshToko()
                         bukaJual(s, "semua")
                 end)
         end
-        if order == 0 then
-                mk("TextLabel", { Size = UDim2.new(1, -8, 0, 40), BackgroundTransparency = 1, Text = "Tidak ada hasil panen untuk dijual.", TextSize = UIStyle.UkuranKecil, Font = FON, TextColor3 = warna(UIStyle.Abu), LayoutOrder = 1 }, tokoSell)
+        if jumlahJual == 0 then
+                mk("TextLabel", { Size = UDim2.new(1, -8, 0, 40), BackgroundTransparency = 1, Text = "Tidak ada hasil panen untuk dijual.", TextSize = UIStyle.UkuranKecil, Font = FON, TextColor3 = warna(UIStyle.Abu), LayoutOrder = order + 1 }, tokoSell)
         end
 end
 

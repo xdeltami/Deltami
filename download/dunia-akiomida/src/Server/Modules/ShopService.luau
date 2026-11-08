@@ -113,4 +113,29 @@ function ShopService.sell(player, cropId: any, count: any): (boolean, string)
         return true, "Terjual " .. diambil .. " " .. info.nama .. " (+" .. UangLogic.format(total) .. " Micda)."
 end
 
+function ShopService.buyBenih(player, seedId: any): (boolean, string)
+        if type(seedId) ~= "string" or not CropData.diTokoBenih[seedId] then
+                return false, "Benih itu tidak dijual di Toko Benih Dataran."
+        end
+        if not ShopService.near(player, 45) then
+                return false, "Dekati kasir Toko Benih dulu."
+        end
+        local info = CropData.byId[seedId]
+        if not info then
+                return false, "Benih tidak dikenal."
+        end
+        local harga = CropData.HargaBenihDataran
+        if not Uang or Uang.GetMicda(player) < harga then
+                return false, "Micda tidak cukup."
+        end
+        if not Tas.canFitBatch(player, { { kind = "benih", id = seedId, count = 1 } }) then
+                return false, "Tas penuh! Kosongkan slot dulu."
+        end
+        if not Uang.SpendMicda(player, harga, "beli_benih") then
+                return false, "Micda tidak cukup."
+        end
+        Tas.add(player, "benih", seedId, 1)
+        return true, info.nama .. " masuk tas! Tumbuh " .. tostring(info.tumbuh or CropData.GrowTime) .. " detik."
+end
+
 return ShopService
