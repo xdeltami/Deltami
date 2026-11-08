@@ -46,6 +46,7 @@ MODULES_SERVER = [
     "PlotService",
     "ShopService",
     "WorldBuilder",
+    "DataranBuilder",
     "ZonaService",
     "TanamService",
     "GudangService",

@@ -208,6 +208,86 @@ if dunia then
 end
 check("Pusat kota hanya punya satu bangunan: TokoBenih", #modelNames == 1 and modelNames[1] == "TokoBenih", table.concat(modelNames, ","))
 
+section("Dataran: objek tidak tenggelam (regresi pivot)")
+local dataran = Workspace:FindFirstChild("Dataran")
+check("Folder Dataran dibangun saat boot", dataran ~= nil)
+
+-- Kaki bagian terendah sebuah model harus menyentuh permukaan tanah.
+local function dasarTerendah(model)
+        local minY = math.huge
+        for _, d in ipairs(model:GetDescendants()) do
+                if d:IsA("BasePart") then
+                        local y = d.CFrame.Position.Y - d.Size.Y / 2
+                        if y < minY then
+                                minY = y
+                        end
+                end
+        end
+        return minY
+end
+
+local function kumpulkanModel(prefix)
+        local out = {}
+        if dataran then
+                for _, d in ipairs(dataran:GetDescendants()) do
+                        if d:IsA("Model") and string.sub(d.Name, 1, #prefix) == prefix then
+                                table.insert(out, d)
+                        end
+                end
+        end
+        return out
+end
+
+local rumahSemua = kumpulkanModel("RumahDesa")
+check("Rumah permukiman dibangun (4)", #rumahSemua == 4, tostring(#rumahSemua))
+local rumahTenggelam = 0
+for _, r in ipairs(rumahSemua) do
+        if dasarTerendah(r) < -0.05 then
+                rumahTenggelam += 1
+        end
+end
+check("Tidak ada rumah desa tenggelam", rumahTenggelam == 0, tostring(rumahTenggelam) .. " rumah terkubur")
+
+local npcSemua = kumpulkanModel("NPC ")
+check("NPC Dataran hidup (>= 8)", #npcSemua >= 8, tostring(#npcSemua))
+local npcTenggelam = 0
+for _, n in ipairs(npcSemua) do
+        if dasarTerendah(n) < -0.05 then
+                npcTenggelam += 1
+        end
+end
+check("Tidak ada NPC tenggelam", npcTenggelam == 0, tostring(npcTenggelam) .. " NPC terkubur")
+
+local bangunanTenggelam = 0
+for _, nama in ipairs({ "KincirAngin", "Sumur", "Sepeda", "KiosPasar", "Gerobak" }) do
+        for _, b in ipairs(kumpulkanModel(nama)) do
+                if dasarTerendah(b) < -0.05 then
+                        bangunanTenggelam += 1
+                end
+        end
+end
+check("Kincir, sumur, sepeda, kios, gerobak berdiri di tanah", bangunanTenggelam == 0, tostring(bangunanTenggelam) .. " objek terkubur")
+
+section("Dataran: masterplan jalan aspal & kehidupan")
+local hitung = { JalanAspal = 0, JalurSepeda = 0, Trotoar = 0, MarkaPutih = 0, ZebraCross = 0 }
+if dataran then
+        for _, d in ipairs(dataran:GetDescendants()) do
+                if hitung[d.Name] then
+                        hitung[d.Name] += 1
+                end
+        end
+end
+check("Jalan aspal minimal 6 segmen", hitung.JalanAspal >= 6, tostring(hitung.JalanAspal))
+check("Jalur sepeda minimal 10 ruas", hitung.JalurSepeda >= 10, tostring(hitung.JalurSepeda))
+check("Trotoar minimal 10 ruas", hitung.Trotoar >= 10, tostring(hitung.Trotoar))
+check("Marka jalan minimal 30 potong", hitung.MarkaPutih >= 30, tostring(hitung.MarkaPutih))
+check("Zebra cross minimal 20 batang", hitung.ZebraCross >= 20, tostring(hitung.ZebraCross))
+check("Kios pasar tani (4)", #kumpulkanModel("KiosPasar") == 4, tostring(#kumpulkanModel("KiosPasar")))
+check("Rak sepeda (2)", #kumpulkanModel("RakSepeda") == 2, tostring(#kumpulkanModel("RakSepeda")))
+check("Kawanan burung mengitari air mancur", #kumpulkanModel("KawananBurung") == 1)
+local petunjuk = kumpulkanModel("PapanPetunjuk")
+check("Papan petunjuk arah bertingkat (1)", #petunjuk == 1, tostring(#petunjuk))
+
 local teksTerlarang = {}
 if dunia then
         for _, d in ipairs(dunia:GetDescendants()) do

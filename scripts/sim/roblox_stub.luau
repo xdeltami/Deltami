@@ -450,6 +450,14 @@ function task.defer(fn, ...)
         return task.spawn(fn, ...)
 end
 
+function Signal:Wait()
+        local coro = coroutine.running()
+        local t0 = Scheduler.vtime
+        schedule(coro, Scheduler.vtime + 0.03)
+        coroutine.yield()
+        return Scheduler.vtime - t0
+end
+
 function Scheduler.advance(dt)
         local target = Scheduler.vtime + dt
         local guard = 0
@@ -934,6 +942,16 @@ function Stub.install()
                 return nil
         end
 
+        local TeleportService = Instance.new("TeleportService")
+        function TeleportService:TeleportAsync(placeId, players, options)
+                Stub.lastTeleport = { placeId = placeId, players = players }
+                return true
+        end
+
+        local Lighting = Instance.new("Lighting")
+        Lighting.ClockTime = 14
+        Lighting.Brightness = 2
+
         local services = {
                 Players = Players,
                 Workspace = Workspace,
@@ -944,6 +962,8 @@ function Stub.install()
                 GuiService = GuiService,
                 TweenService = TweenService,
                 Debris = Debris,
+                TeleportService = TeleportService,
+                Lighting = Lighting,
         }
 
         game = Instance.new("DataModel")
