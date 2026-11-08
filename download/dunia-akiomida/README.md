@@ -1,6 +1,48 @@
 # DUNIA AKIOMIDA (Roblox)
 
 Status: LIVE di Roblox (**versionNumber 69**, 8 Nov 2026) — **DATARAN SESUAI GDD PLACE 01: TOKO BENIH 30 BENIH (1 KOIN, TUMBUH 1 DETIK) + ALUN-ALUN + PERMUKIMAN + KEBUN DEMO + PERBUKITAN + 4 GERBANG KAWASAN**
+BUILD v70 SIAP (8 Nov 2026): rojo build sukses, semua tes hijau — publish menunggu API key baru dari pemilik (key sebelumnya kedaluwarsa).
+
+BARU v70 — PERBAIKAN TENGGELAM + JALAN MASTERPLAN RAPI (verifikasi laporan pemilik: "Ini bagus hanya saja kenapa bangunan masyarakat itu tenggelam dan ada beberapa NPC yang tenggelam... lebih diperkaya lagi... ada jalan aspal jalan pesepeda dan semuanya tertata seperti sudah ada masterplan nya"):
+
+1. **AKAR TENGGELAM DIBUNUH Tuntas (3 lapis)** — (a) perabot plaza alun-alun
+   (4 bangku, 4 lampu, 2 NPC, papan petunjuk, papan selamat datang, 2 tali
+   bendera) dulu dibangun dari tanah (Y=0) padahal plaza beton setinggi
+   0.275 stud sehingga kaki terkubur; kini SEMUA perabot plaza berdiri di
+   lantai plaza (PLAZA_Y); (b) model ber-pivot (rumah desa permukiman,
+   kincir angin, sumur) memakai WorldPivot titik tanah sebelum PivotTo;
+   (c) ujian regresi geometri baru mengunci semuanya permanen.
+2. **UJIAN REGRESI GEOMETRI BARU (ujian massa +7 cek)** — (a) tak ada NPC
+   terkubur di bawah tanah; (b) perabot plaza berdiri di lantai plaza;
+   (c) koridor jalan aspal bebas penghalang pijakan (8 koridor diperiksa);
+   (d) tak ada jalan aspal koplanar dengan path hub (anti z-fighting).
+   Ujian ini otomatis MENOLAK build jika ada objek tenggelam/menghalangi
+   jalan di sesi berikutnya.
+3. **Z-FIGHTING DIHABISKAN** — jalan Barat/Timur/Utara/Selatan/PusatKota
+   dinaikkan setebal 0.24 stud sehingga tidak lagi sepermukaan dengan path
+   hub (0.2) — kedip-kedip permukaan di persimpangan hilang.
+4. **TAMAN HUB DIRELOKASI DARI TENGAH JALAN** — 2 bed bunga, 2 pohon hias,
+   2 lampu taman yang dulu berdiri DI KORIDOR jalan aspal Barat dipindah
+   menjadi baratan taman rapi di selatan jalan; 2 tiang bendera digeser
+   dari tengah trotoar jalan PusatKota ke tepi rumput.
+5. **JEMBATAN RATA JALAN** — papan dek timbul yang menghalangi jalan aspal
+   Timur di atas sungai dihapus; jalan kini melintasi sungai mulus dengan
+   4 tiang jembatan batu + 2 pagar pengaman kayu; gerobak yang setengah
+   rodanya di air dipindah ke darat; 3 pohon + 1 batu baru menegeruni tepi
+   sungai.
+6. **JALAN TOKO TIDAK MENEMBUS BANGUNAN** — driveway PusatKota dipendekkan
+   berhenti sebelum dinding depan Toko Benih.
+7. **PAPAN NAMA JALAN** — JL. KAMPUNG / JL. STEPA / JL. SABANA / JL.
+   PERLADANGAN terpasang di pinggir persimpangan utama (sentuhan
+   masterplan).
+8. **PENGAYAAN DATARAN** — 12 pohon pelanjang + 10 titik bunga liar baru
+   mengisi rumput kosong di sepanjang koridor jalan; gang permukiman
+   diperpanjang hingga menyambung jalan aspal Barat; tebal plaza/ring
+   disesuaikan; lampu jalan + pohon pinggir jalan + zebra cross tetap
+   dari sesi sebelumnya.
+9. **MUTU** — offline 421 PASS / 0 FAIL; playtest 206 PASS / 0 FAIL;
+   ujian massa 129 PASS / 0 FAIL (termasuk 7 cek geometri baru);
+   luau-lsp analyze 0 temuan; rojo build sukses.
 
 BARU v69 — DATARAN (mandat pemilik: benahi Dataran, bukan membuat tampilan lain):
 

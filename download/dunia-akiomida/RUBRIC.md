@@ -42,6 +42,44 @@ fokus sesi ini pembangunan Dataran sesuai mandat pemilik.
 Rencana berikutnya (urut): gerbang kembali di 4 place kawasan; NPC
 berjalan + animasi lingkungan; pencahayaan malam; ikon benih di katalog.
 
+## Skor v70 (build siap, 8 Nov 2026) - PERBAIKAN TENGGELAM + JALAN MASTERPLAN RAPI
+
+Laporan pemilik: "Ini bagus hanya saja kenapa bangunan masyarakat itu
+tenggelam dan ada beberapa NPC yang tenggelam... lebih diperkaya lagi...
+ada jalan aspal jalan pesepeda dan semuanya tertata seperti sudah ada
+masterplan nya". Yang dikerjakan di v70:
+
+1. **Geometri bersih tuntas** — perabot plaza alun-alun (bangku, lampu,
+   NPC, papan, bendera) yang terkubur 0.245-0.28 stud di beton plaza kini
+   berdiri di lantai plaza; model pivot (rumah/kincir/sumur) ber WorldPivot
+   titik tanah; jalan tidak lagi menembus Toko Benih; gerobak keluar dari
+   tepi sungai.
+2. **Jalan masterplan rapi** — jaringan jalan aspal dua arah (marka putus-
+   putus, trotoar timbul, jalur sepeda merah dua sisi) radiasi ke 4 gerbang
+   kawasan; zebra cross di 4 mulut alun-alun; lampu jalan + pohon pelanjang
+   bolak-balik; papan nama jalan di persimpangan; taman hub yang dulu di
+   tengah jalan direlokasi jadi baratan rapi; z-fighting persimpangan
+   dihabiskan; jembatan sungai kini rata dengan jalan (tiang + pagar).
+3. **Pengayaan** — 12 pohon pelanjang + 10 titik bunga liar baru di rumput
+   kosong koridor jalan; gang permukiman menyambung jalan aspal.
+4. **Mutu** — offline 421 PASS / 0 FAIL; playtest 206 PASS / 0 FAIL;
+   massa 129 PASS / 0 FAIL (7 cek regresi geometri baru); luau-lsp 0
+   temuan; rojo build sukses. Publish #70 menunggu key baru pemilik.
+
+| # | Kriteria | Skor | Alasan |
+|---|----------|------|--------|
+| 1 Kombat | 0/10 | Belum ada monster/AI/bos. |
+| 2 Crafting | 4.5/10 | Tetap dari #51. |
+| 3 Stat & Progresi | 1/10 | Tanpa level (sesuai arah pemilik). |
+| 4 Ekonomi | 9/10 | Tetap dari #60 (integritas data). |
+| 5 Dunia & Peta | 7.5/10 | Naik dari 7: Dataran kini punya jaringan jalan masterplan (aspal+sepeda+trotoar+marka+zebra+nama jalan), geometri bebas tenggelam (terkunci ujian regresi), jembatan rata jalan, taman tertata. |
+| 6 Multiplayer | 7/10 | Tetap dari #51. |
+| 7 Bertani | 10/10 | Tetap. |
+| 8 Polish & UX | 10/10 | Permukaan tak lagi kedip (anti z-fight), objek tak lagi tenggelam — ditambah ujian geometri permanen. |
+| 9 Originalitas | 10/10 | Tetap. |
+
+**TOTAL: 60.8/100** (bobot: 0+67.5+10+135+75+70+100+100+50 = 607.5/10 = 60.75)
+
 ## Skor v56 (versi LIVE #60, 7 Nov 2026) - DATA TIDAK PERNAH NOL LAGI: PEMULIHAN KELUAR-MASUK (ANTI-HAPUS DATA)
 
 Keluhan pemilik: "Masalah besar tetap — waktu user keluar masuk lagi,

@@ -1,0 +1,832 @@
+     1→local ReplicatedStorage = game:GetService("ReplicatedStorage")
+     2→local RunService = game:GetService("RunService")
+     3→
+     4→local BuildingKit = require(script.Parent.BuildingKit)
+     5→local CropData = require(ReplicatedStorage.Shared.CropData)
+     6→
+     7→local DataranBuilder = {}
+     8→
+     9→-- Palet Dataran
+    10→local RUMPUT = Color3.fromRGB(106, 168, 79)
+    11→local RUMPUT_TUA = Color3.fromRGB(88, 142, 66)
+    12→local TANAH = Color3.fromRGB(134, 100, 62)
+    13→local JALAN = Color3.fromRGB(178, 168, 150)
+    14→local ASPAL = Color3.fromRGB(56, 58, 62)
+    15→local MARKA = Color3.fromRGB(236, 233, 224)
+    16→local TROTOAR = Color3.fromRGB(192, 187, 176)
+    17→local SEPEDA = Color3.fromRGB(174, 62, 48)
+    18→local KAYU = Color3.fromRGB(160, 110, 60)
+    19→local KAYU_TUA = Color3.fromRGB(112, 76, 42)
+    20→local DINDING = Color3.fromRGB(222, 206, 178)
+    21→local ATAP = Color3.fromRGB(168, 78, 58)
+    22→local BATU = Color3.fromRGB(142, 140, 134)
+    23→local AIR = Color3.fromRGB(96, 168, 220)
+    24→local KERING = Color3.fromRGB(196, 178, 108)
+    25→local PUTIH = Color3.fromRGB(238, 234, 224)
+    26→local BENDERA = {
+    27→        Color3.fromRGB(216, 84, 66),
+    28→        Color3.fromRGB(240, 196, 84),
+    29→        Color3.fromRGB(110, 168, 92),
+    30→        Color3.fromRGB(96, 148, 200),
+    31→}
+    32→local BUNGA_LIAR = {
+    33→        Color3.fromRGB(232, 96, 84),
+    34→        Color3.fromRGB(240, 196, 84),
+    35→        Color3.fromRGB(240, 240, 240),
+    36→        Color3.fromRGB(196, 130, 208),
+    37→        Color3.fromRGB(140, 190, 240),
+    38→}
+    39→
+    40→local GT = 0
+    41→
+    42→local function part(parent: Instance, size: Vector3, cf: CFrame, color: Color3, material: Enum.Material?, transparency: number?): Part
+    43→        return BuildingKit.part(parent, size, cf, color, material, transparency)
+    44→end
+    45→
+    46→local function teksPapan(papan: Part, face: Enum.NormalId, teks: string)
+    47→        local gui = Instance.new("SurfaceGui")
+    48→        gui.Face = face
+    49→        gui.CanvasSize = Vector2.new(700, 220)
+    50→        gui.Parent = papan
+    51→        local label = Instance.new("TextLabel")
+    52→        label.Size = UDim2.new(1, 0, 1, 0)
+    53→        label.BackgroundTransparency = 1
+    54→        label.Text = teks
+    55→        label.TextScaled = true
+    56→        label.Font = Enum.Font.GothamBold
+    57→        label.TextColor3 = Color3.fromRGB(42, 28, 14)
+    58→        label.Parent = gui
+    59→end
+    60→
+    61→local function papanTeks(parent: Instance, x: number, z: number, teks: string, yaw: number, tinggi: number)
+    62→        part(parent, Vector3.new(0.5, tinggi, 0.5), CFrame.new(x, GT + tinggi / 2, z), KAYU_TUA, Enum.Material.Wood)
+    63→        local papan = part(parent, Vector3.new(7, 2.2, 0.3), CFrame.new(x, GT + tinggi + 0.4, z) * CFrame.Angles(0, yaw, 0), KAYU, Enum.Material.Wood)
+    64→        teksPapan(papan, Enum.NormalId.Front, teks)
+    65→        teksPapan(papan, Enum.NormalId.Back, teks)
+    66→        return papan
+    67→end
+    68→
+    69→local function bangku(parent: Instance, x: number, z: number, yaw: number)
+    70→        local m = Instance.new("Model")
+    71→        m.Name = "BangkuTaman"
+    72→        m.Parent = parent
+    73→        local dudukan = part(m, Vector3.new(3.2, 0.3, 1.1), CFrame.new(x, GT + 0.85, z) * CFrame.Angles(0, yaw, 0), KAYU, Enum.Material.Wood)
+    74→        part(m, Vector3.new(3.2, 1.1, 0.25), CFrame.new(x, GT + 1.5, z) * CFrame.Angles(0, yaw, 0) * CFrame.new(0, 0, -0.45), KAYU, Enum.Material.Wood)
+    75→        part(m, Vector3.new(0.3, 0.85, 1), CFrame.new(x, GT + 0.43, z) * CFrame.Angles(0, yaw, 0) * CFrame.new(-1.3, 0, 0), KAYU_TUA, Enum.Material.Wood)
+    76→        part(m, Vector3.new(0.3, 0.85, 1), CFrame.new(x, GT + 0.43, z) * CFrame.Angles(0, yaw, 0) * CFrame.new(1.3, 0, 0), KAYU_TUA, Enum.Material.Wood)
+    77→        return dudukan
+    78→end
+    79→
+    80→local function lampuTaman(parent: Instance, x: number, z: number)
+    81→        local m = Instance.new("Model")
+    82→        m.Name = "LampuTaman"
+    83→        m.Parent = parent
+    84→        part(m, Vector3.new(0.4, 3.6, 0.4), CFrame.new(x, GT + 1.8, z), KAYU_TUA, Enum.Material.Metal)
+    85→        local bola = part(m, Vector3.new(1, 1, 1), CFrame.new(x, GT + 3.9, z), PUTIH, Enum.Material.Neon)
+    86→        bola.Shape = Enum.PartType.Ball
+    87→        local cahaya = Instance.new("PointLight")
+    88→        cahaya.Range = 14
+    89→        cahaya.Brightness = 1.1
+    90→        cahaya.Color = Color3.fromRGB(255, 226, 160)
+    91→        cahaya.Parent = bola
+    92→end
+    93→
+    94→local function pohonAlam(parent: Instance, x: number, z: number, skala: number?)
+    95→        local s = skala or 1
+    96→        local m = Instance.new("Model")
+    97→        m.Name = "PohonAlam"
+    98→        m.Parent = parent
+    99→        local tinggi = 4.5 * s
+   100→        part(m, Vector3.new(0.9 * s, tinggi, 0.9 * s), CFrame.new(x, GT + tinggi / 2, z), KAYU_TUA, Enum.Material.Wood)
+   101→        local daun1 = part(m, Vector3.new(4.4 * s, 3.6 * s, 4.4 * s), CFrame.new(x, GT + tinggi + 1.2, z), RUMPUT_TUA, Enum.Material.Grass)
+   102→        daun1.Shape = Enum.PartType.Ball
+   103→        local daun2 = part(m, Vector3.new(2.8 * s, 2.4 * s, 2.8 * s), CFrame.new(x + 1.1 * s, GT + tinggi + 1.9 * s, z - 0.7 * s), Color3.fromRGB(98, 156, 72), Enum.Material.Grass)
+   104→        daun2.Shape = Enum.PartType.Ball
+   105→end
+   106→
+   107→local function batuAlam(parent: Instance, x: number, z: number, dia: number)
+   108→        local b = part(parent, Vector3.new(dia, dia * 0.8, dia), CFrame.new(x, GT + dia * 0.25, z), BATU, Enum.Material.Slate)
+   109→        b.Shape = Enum.PartType.Ball
+   110→end
+   111→
+   112→local function bukit(parent: Instance, x: number, z: number, dia: number, tinggi: number)
+   113→        local b = part(parent, Vector3.new(dia, dia, dia), CFrame.new(x, GT - dia / 2 + tinggi, z), RUMPUT, Enum.Material.Grass)
+   114→        b.Shape = Enum.PartType.Ball
+   115→end
+   116→
+   117→local function tanamanDemo(parent: Instance, x: number, z: number, cropId: string)
+   118→        local b = CropData.Bentuk[cropId]
+   119→        if not b then
+   120→                return
+   121→        end
+   122→        local w = Color3.fromRGB(b.warna[1], b.warna[2], b.warna[3])
+   123→        local tinggi = math.min(b.t, 2.6)
+   124→        if b.jenis == "pohon" then
+   125→                part(parent, Vector3.new(0.5, tinggi * 0.55, 0.5), CFrame.new(x, GT + tinggi * 0.28, z), KAYU_TUA, Enum.Material.Wood)
+   126→                local d = part(parent, Vector3.new(2.1, 2.1, 2.1), CFrame.new(x, GT + tinggi * 0.55 + 0.9, z), w, Enum.Material.Grass)
+   127→                d.Shape = Enum.PartType.Ball
+   128→        elseif b.jenis == "bulat" or b.jenis == "kacang" then
+   129→                local dia = math.min(b.w, 2)
+   130→                local d = part(parent, Vector3.new(dia, dia, dia), CFrame.new(x, GT + dia / 2, z), w, Enum.Material.Grass)
+   131→                d.Shape = Enum.PartType.Ball
+   132→        else
+   133→                part(parent, Vector3.new(math.max(b.w * 0.5, 0.5), tinggi, math.max(b.w * 0.5, 0.5)), CFrame.new(x, GT + tinggi / 2, z), w, Enum.Material.Grass)
+   134→        end
+   135→end
+   136→
+   137→local function airMancur(parent: Instance, x: number, z: number)
+   138→        local m = Instance.new("Model")
+   139→        m.Name = "AirMancur"
+   140→        m.Parent = parent
+   141→        part(m, Vector3.new(15, 1, 15), CFrame.new(x, GT + 0.5, z), BATU, Enum.Material.Cobblestone)
+   142→        local bak = part(m, Vector3.new(1.4, 12.4, 12.4), CFrame.new(x, GT + 1.9, z) * CFrame.Angles(0, 0, math.rad(90)), BATU, Enum.Material.Cobblestone)
+   143→        bak.Shape = Enum.PartType.Cylinder
+   144→        local air = part(m, Vector3.new(0.6, 10.8, 10.8), CFrame.new(x, GT + 2.4, z) * CFrame.Angles(0, 0, math.rad(90)), AIR, Enum.Material.Glass, 0.35)
+   145→        air.Shape = Enum.PartType.Cylinder
+   146→        air.CanCollide = false
+   147→        part(m, Vector3.new(1.3, 3, 1.3), CFrame.new(x, GT + 3.4, z), BATU, Enum.Material.Cobblestone)
+   148→        local mangkuk = part(m, Vector3.new(0.9, 5.2, 5.2), CFrame.new(x, GT + 5.4, z) * CFrame.Angles(0, 0, math.rad(90)), BATU, Enum.Material.Cobblestone)
+   149→        mangkuk.Shape = Enum.PartType.Cylinder
+   150→        local semburan = part(m, Vector3.new(0.55, 2.6, 0.55), CFrame.new(x, GT + 7.2, z), AIR, Enum.Material.Glass, 0.45)
+   151→        semburan.CanCollide = false
+   152→        local pucuk = part(m, Vector3.new(0.9, 0.9, 0.9), CFrame.new(x, GT + 8.6, z), AIR, Enum.Material.Neon, 0.3)
+   153→        pucuk.Shape = Enum.PartType.Ball
+   154→        pucuk.CanCollide = false
+   155→end
+   156→
+   157→local function gerbangKawasan(parent: Instance, x: number, z: number, yaw: number, nama: string, kode: string, warnaPilar: Color3, hooks)
+   158→        local m = Instance.new("Model")
+   159→        m.Name = "Gerbang" .. nama
+   160→        m.Parent = parent
+   161→        local cf = CFrame.new(x, GT, z) * CFrame.Angles(0, yaw, 0)
+   162→        part(m, Vector3.new(2.2, 9, 2.2), cf * CFrame.new(-5.2, 4.5, 0), warnaPilar, Enum.Material.Wood)
+   163→        part(m, Vector3.new(2.2, 9, 2.2), cf * CFrame.new(5.2, 4.5, 0), warnaPilar, Enum.Material.Wood)
+   164→        local balok = part(m, Vector3.new(13.4, 1.7, 2.4), cf * CFrame.new(0, 9.5, 0), warnaPilar, Enum.Material.Wood)
+   165→        local papan = part(m, Vector3.new(9, 2.3, 0.4), cf * CFrame.new(0, 11.2, 0), KAYU, Enum.Material.Wood)
+   166→        teksPapan(papan, Enum.NormalId.Front, nama)
+   167→        teksPapan(papan, Enum.NormalId.Back, nama)
+   168→        local prompt = Instance.new("ProximityPrompt")
+   169→        prompt.ActionText = "Menuju " .. nama
+   170→        prompt.ObjectText = "Gerbang " .. nama
+   171→        prompt.HoldDuration = 0.5
+   172→        prompt.MaxActivationDistance = 12
+   173→        prompt.RequiresLineOfSight = false
+   174→        prompt.Parent = balok
+   175→        prompt.Triggered:Connect(function(player: Player)
+   176→                if hooks and hooks.onGerbangKawasan then
+   177→                        hooks.onGerbangKawasan(player, kode)
+   178→                end
+   179→        end)
+   180→end
+   181→
+   182→-- ====================================================================
+   183→-- PERBAIKAN TENGGELAM: semua model yang dibangun di koordinat lokal
+   184→-- WAJIB menyetel WorldPivot ke titik tanah (0,0,0) sebelum PivotTo,
+   185→-- kalau tidak pivot model memakai tengah bounding box dan separuh
+   186→-- bangunan terkubur di tanah.
+   187→-- ====================================================================
+   188→
+   189→local function rumahDesa(parent: Instance, x: number, z: number, menghadapTimur: boolean)
+   190→        local m = Instance.new("Model")
+   191→        m.Name = "RumahDesa"
+   192→        m.Parent = parent
+   193→        local yaw = menghadapTimur and math.rad(90) or math.rad(-90)
+   194→        part(m, Vector3.new(11, 0.5, 9), CFrame.new(0, 0.25, 0), KAYU, Enum.Material.WoodPlanks)
+   195→        part(m, Vector3.new(11, 5, 0.5), CFrame.new(0, 3, -4.25), DINDING, Enum.Material.WoodPlanks)
+   196→        part(m, Vector3.new(0.5, 5, 9), CFrame.new(-5.25, 3, 0), DINDING, Enum.Material.WoodPlanks)
+   197→        part(m, Vector3.new(0.5, 5, 9), CFrame.new(5.25, 3, 0), DINDING, Enum.Material.WoodPlanks)
+   198→        part(m, Vector3.new(4, 5, 0.5), CFrame.new(-3.5, 3, 4.25), DINDING, Enum.Material.WoodPlanks)
+   199→        part(m, Vector3.new(4, 5, 0.5), CFrame.new(3.5, 3, 4.25), DINDING, Enum.Material.WoodPlanks)
+   200→        part(m, Vector3.new(3, 0.8, 0.5), CFrame.new(0, 5.4, 4.25), DINDING, Enum.Material.WoodPlanks)
+   201→        local jendela = part(m, Vector3.new(0.3, 1.7, 2.2), CFrame.new(-5.3, 3.45, -1.5), AIR, Enum.Material.Glass, 0.45)
+   202→        jendela.CanCollide = false
+   203→        local jendela2 = part(m, Vector3.new(0.3, 1.7, 2.2), CFrame.new(5.3, 3.45, 1), AIR, Enum.Material.Glass, 0.45)
+   204→        jendela2.CanCollide = false
+   205→        -- tangga depan kecil agar pintu tidak menggantung
+   206→        part(m, Vector3.new(3, 0.4, 1.6), CFrame.new(0, 0.2, 5.05), BATU, Enum.Material.Concrete)
+   207→        BuildingKit.gableRoof(m, 12, 10, 2.6, 5.6, ATAP)
+   208→        m.WorldPivot = CFrame.new(0, 0, 0)
+   209→        m:PivotTo(CFrame.new(x, GT, z) * CFrame.Angles(0, yaw, 0))
+   210→end
+   211→
+   212→local function npc(parent: Instance, x: number, z: number, yaw: number, nama: string, warnaBaju: Color3)
+   213→        local m = Instance.new("Model")
+   214→        m.Name = "NPC " .. nama
+   215→        m.Parent = parent
+   216→        local cf = CFrame.new(x, GT, z) * CFrame.Angles(0, yaw, 0)
+   217→        part(m, Vector3.new(1.5, 1.7, 0.85), cf * CFrame.new(0, 0.85, 0), Color3.fromRGB(70, 76, 112), Enum.Material.Fabric)
+   218→        part(m, Vector3.new(2.1, 2, 1.05), cf * CFrame.new(0, 2.7, 0), warnaBaju, Enum.Material.Fabric)
+   219→        local kepala = part(m, Vector3.new(1.5, 1.5, 1.5), cf * CFrame.new(0, 4.4, 0), Color3.fromRGB(234, 190, 156), Enum.Material.SmoothPlastic)
+   220→        kepala.Shape = Enum.PartType.Ball
+   221→        part(m, Vector3.new(1.9, 0.45, 1.9), cf * CFrame.new(0, 5.25, 0), KAYU_TUA, Enum.Material.Wood)
+   222→        local gui = Instance.new("BillboardGui")
+   223→        gui.Size = UDim2.new(0, 120, 0, 30)
+   224→        gui.StudsOffset = Vector3.new(0, 3.4, 0)
+   225→        gui.AlwaysOnTop = true
+   226→        gui.Parent = kepala
+   227→        local label = Instance.new("TextLabel")
+   228→        label.Size = UDim2.new(1, 0, 1, 0)
+   229→        label.BackgroundTransparency = 1
+   230→        label.Text = nama
+   231→        label.Font = Enum.Font.GothamBold
+   232→        label.TextSize = 16
+   233→        label.TextColor3 = Color3.new(1, 1, 1)
+   234→        label.TextStrokeTransparency = 0.4
+   235→        label.Parent = gui
+   236→        -- PERBAIKAN TENGGELAM NPC: bob animasi memakai pivot awal model
+   237→        -- (pivot bbox memusat di perut karakter, bukan di kaki).
+   238→        local pivot0 = m:GetPivot()
+   239→        task.spawn(function()
+   240→                local t = 0
+   241→                while m.Parent do
+   242→                        local dt = RunService.Heartbeat:Wait()
+   243→                        t += dt
+   244→                        m:PivotTo(pivot0 * CFrame.new(0, math.abs(math.sin(t * 2)) * 0.16, 0))
+   245→                end
+   246→        end)
+   247→end
+   248→
+   249→local function kincirAngin(parent: Instance, x: number, z: number, yaw: number)
+   250→        local m = Instance.new("Model")
+   251→        m.Name = "KincirAngin"
+   252→        m.Parent = parent
+   253→        local dasar = CFrame.new(x, GT, z) * CFrame.Angles(0, yaw, 0)
+   254→        part(m, Vector3.new(9, 1.2, 9), CFrame.new(0, 0.6, 0), BATU, Enum.Material.Slate)
+   255→        part(m, Vector3.new(6.4, 6, 6.4), CFrame.new(0, 4.2, 0), PUTIH, Enum.Material.WoodPlanks)
+   256→        part(m, Vector3.new(4.6, 5.4, 4.6), CFrame.new(0, 9.9, 0), PUTIH, Enum.Material.WoodPlanks)
+   257→        BuildingKit.gableRoof(m, 6, 6, 2.2, 12.6, ATAP)
+   258→        part(m, Vector3.new(1, 1, 1), CFrame.new(0, 10.4, -2.9), KAYU_TUA, Enum.Material.Wood)
+   259→        local bilah = {}
+   260→        for i = 1, 4 do
+   261→                bilah[i] = part(m, Vector3.new(0.7, 8, 0.28), CFrame.new(0, 10.4, -2.9), KAYU, Enum.Material.Wood)
+   262→        end
+   263→        m.WorldPivot = CFrame.new(0, 0, 0)
+   264→        m:PivotTo(dasar)
+   265→        task.spawn(function()
+   266→                local sudut = 0
+   267→                while m.Parent do
+   268→                        local dt = RunService.Heartbeat:Wait()
+   269→                        sudut += dt * 1.3
+   270→                        for i, b in ipairs(bilah) do
+   271→                                if b.Parent then
+   272→                                        b.CFrame = dasar * CFrame.new(0, 10.4, -2.9) * CFrame.Angles(0, 0, sudut + math.pi * (i - 1) / 2) * CFrame.new(0, 3.9, 0)
+   273→                                end
+   274→                        end
+   275→                end
+   276→        end)
+   277→end
+   278→
+   279→local function sumur(parent: Instance, x: number, z: number)
+   280→        local m = Instance.new("Model")
+   281→        m.Name = "Sumur"
+   282→        m.Parent = parent
+   283→        local badan = part(m, Vector3.new(1.8, 3, 3), CFrame.new(0, 1.5, 0) * CFrame.Angles(0, 0, math.rad(90)), BATU, Enum.Material.Cobblestone)
+   284→        badan.Shape = Enum.PartType.Cylinder
+   285→        local air = part(m, Vector3.new(0.4, 2.4, 2.4), CFrame.new(0, 2.3, 0) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(40, 70, 110), Enum.Material.Glass, 0.2)
+   286→        air.Shape = Enum.PartType.Cylinder
+   287→        air.CanCollide = false
+   288→        part(m, Vector3.new(0.4, 3.4, 0.4), CFrame.new(-1.4, 1.7, 0), KAYU_TUA, Enum.Material.Wood)
+   289→        part(m, Vector3.new(0.4, 3.4, 0.4), CFrame.new(1.4, 1.7, 0), KAYU_TUA, Enum.Material.Wood)
+   290→        BuildingKit.gableRoof(m, 3.6, 3.4, 1.2, 3.4, ATAP)
+   291→        local ember = part(m, Vector3.new(0.8, 0.7, 0.8), CFrame.new(0, 2.4, 0), KAYU, Enum.Material.Wood)
+   292→        ember.CanCollide = false
+   293→        m.WorldPivot = CFrame.new(0, 0, 0)
+   294→        m:PivotTo(CFrame.new(x, GT, z))
+   295→end
+   296→
+   297→local function gerobak(parent: Instance, x: number, z: number, yaw: number)
+   298→        local m = Instance.new("Model")
+   299→        m.Name = "Gerobak"
+   300→        m.Parent = parent
+   301→        local cf = CFrame.new(x, GT, z) * CFrame.Angles(0, yaw, 0)
+   302→        part(m, Vector3.new(3.6, 1.3, 2.1), cf * CFrame.new(0, 1.25, 0), KAYU, Enum.Material.Wood)
+   303→        part(m, Vector3.new(3.7, 0.35, 2.2), cf * CFrame.new(0, 2, 0), KAYU_TUA, Enum.Material.Wood)
+   304→        local roda1 = part(m, Vector3.new(0.35, 1.5, 1.5), cf * CFrame.new(-1.4, 0.75, 0) * CFrame.Angles(0, math.rad(90), 0), KAYU_TUA, Enum.Material.Wood)
+   305→        roda1.Shape = Enum.PartType.Cylinder
+   306→        local roda2 = part(m, Vector3.new(0.35, 1.5, 1.5), cf * CFrame.new(1.4, 0.75, 0) * CFrame.Angles(0, math.rad(90), 0), KAYU_TUA, Enum.Material.Wood)
+   307→        roda2.Shape = Enum.PartType.Cylinder
+   308→        local pegangan = part(m, Vector3.new(1.8, 0.3, 0.3), cf * CFrame.new(2.5, 1.5, 0) * CFrame.Angles(0, 0, math.rad(-24)), KAYU_TUA, Enum.Material.Wood)
+   309→        pegangan.CanCollide = false
+   310→        part(m, Vector3.new(1, 0.8, 1), cf * CFrame.new(-0.7, 2.35, 0), TANAH, Enum.Material.Ground)
+   311→        part(m, Vector3.new(0.9, 0.7, 0.9), cf * CFrame.new(0.5, 2.3, 0.2), RUMPUT_TUA, Enum.Material.Grass)
+   312→end
+   313→
+   314→-- ====================================================================
+   315→-- MASTERPLAN JALAN: aspal + marka + trotoar + jalur sepeda
+   316→-- ====================================================================
+   317→
+   318→local function dalamSkip(skips, v: number): boolean
+   319→        if not skips then
+   320→                return false
+   321→        end
+   322→        for _, r in ipairs(skips) do
+   323→                if v >= r[1] and v <= r[2] then
+   324→                        return true
+   325→                end
+   326→        end
+   327→        return false
+   328→end
+   329→
+   330→-- Jalan aspal dua arah: slab aspal + marka putus-putus + trotoar timbul
+   331→-- dua sisi + jalur sepeda merah dua sisi. Sumbu jalan mengikuti sisi
+   332→-- terpanjang dari (ax,az)->(bx,bz).
+   333→local function jalanAspal(parent: Instance, ax: number, az: number, bx: number, bz: number, o)
+   334→        o = o or {}
+   335→        local lebar = o.lebar or 12
+   336→        local tebal = o.tebal or 0.2
+   337→        local horizontal = math.abs(bx - ax) >= math.abs(bz - az)
+   338→        local len = horizontal and (bx - ax) or (bz - az)
+   339→        local abslen = math.abs(len)
+   340→        local cx, cz = (ax + bx) / 2, (az + bz) / 2
+   341→        local m = Instance.new("Model")
+   342→        m.Name = "Jalan_" .. (o.nama or "Aspal")
+   343→        m.Parent = parent
+   344→        local rot = horizontal and 0 or math.rad(90)
+   345→        local cf0 = CFrame.new(cx, GT, cz) * CFrame.Angles(0, rot, 0)
+   346→        local aspal = part(m, Vector3.new(abslen, tebal, lebar), cf0 * CFrame.new(0, tebal / 2, 0), ASPAL, Enum.Material.Asphalt)
+   347→        aspal.Name = "JalanAspal"
+   348→        local nDash = math.floor((abslen - 6) / 7)
+   349→        for i = 0, nDash - 1 do
+   350→                local along = -abslen / 2 + 6 + i * 7
+   351→                if math.abs(along) < abslen / 2 - 2 then
+   352→                        local dash = part(m, Vector3.new(2.6, 0.06, 0.45), cf0 * CFrame.new(along, tebal + 0.07, 0), MARKA, Enum.Material.SmoothPlastic)
+   353→                        dash.Name = "MarkaPutih"
+   354→                        dash.CanCollide = false
+   355→                end
+   356→        end
+   357→        for _, s in ipairs({ -1, 1 }) do
+   358→                local trotoar = part(m, Vector3.new(abslen, 0.35, 2.4), cf0 * CFrame.new(0, 0.175, s * (lebar / 2 + 0.8)), TROTOAR, Enum.Material.Concrete)
+   359→                trotoar.Name = "Trotoar"
+   360→                local jalur = part(m, Vector3.new(abslen, 0.08, 2), cf0 * CFrame.new(0, tebal + 0.05, s * (lebar / 2 - 1.5)), SEPEDA, Enum.Material.SmoothPlastic)
+   361→                jalur.Name = "JalurSepeda"
+   362→                jalur.CanCollide = false
+   363→        end
+   364→        return m, horizontal, cx, cz, abslen
+   365→end
+   366→
+   367→-- Lampu jalan + pohon pinggir jalan, bolak-balik sisi, dengan daftar
+   368→-- rentang koordinat yang dilewati (persimpangan/zebra/gerbang).
+   369→local function hiasJalan(parent: Instance, horizontal: boolean, cx: number, cz: number, abslen: number, lebar: number, skips)
+   370→        local s = -abslen / 2 + 14
+   371→        local k = 0
+   372→        while s <= abslen / 2 - 14 do
+   373→                local pusatSum = horizontal and cx or cz
+   374→                if not dalamSkip(skips, pusatSum + s) then
+   375→                        local side = (k % 2 == 0) and -1 or 1
+   376→                        local lx, lz
+   377→                        if horizontal then
+   378→                                lx, lz = cx + s, cz + side * (lebar / 2 + 1.2)
+   379→                        else
+   380→                                lx, lz = cx + side * (lebar / 2 + 1.2), cz + s
+   381→                        end
+   382→                        lampuTaman(parent, lx, lz)
+   383→                        local ta = s + 15
+   384→                        if not dalamSkip(skips, pusatSum + ta) then
+   385→                                local tx, tz
+   386→                                if horizontal then
+   387→                                        tx, tz = cx + ta, cz - side * (lebar / 2 + 2.8)
+   388→                                else
+   389→                                        tx, tz = cx - side * (lebar / 2 + 2.8), cz + ta
+   390→                                end
+   391→                                pohonAlam(parent, tx, tz, 0.72)
+   392→                        end
+   393→                end
+   394→                s += 30
+   395→                k += 1
+   396→        end
+   397→end
+   398→
+   399→-- Zebra cross: batang putih memanjang searah jalan, berulang melintang
+   400→-- lebar jalan (gaya piano).
+   401→local function zebraCross(parent: Instance, cx: number, cz: number, horizontal: boolean)
+   402→        for i = 0, 9 do
+   403→                local off = -4.5 + i * 1
+   404→                local p
+   405→                if horizontal then
+   406→                        p = part(parent, Vector3.new(2.6, 0.06, 0.55), CFrame.new(cx, GT + 0.275, cz + off), MARKA, Enum.Material.SmoothPlastic)
+   407→                else
+   408→                        p = part(parent, Vector3.new(0.55, 0.06, 2.6), CFrame.new(cx + off, GT + 0.275, cz), MARKA, Enum.Material.SmoothPlastic)
+   409→                end
+   410→                p.Name = "ZebraCross"
+   411→                p.CanCollide = false
+   412→        end
+   413→end
+   414→
+   415→local function benderaHias(parent: Instance, x1: number, z1: number, x2: number, z2: number)
+   416→        local m = Instance.new("Model")
+   417→        m.Name = "BenderaHias"
+   418→        m.Parent = parent
+   419→        local tinggi = 5.5
+   420→        part(m, Vector3.new(0.3, tinggi, 0.3), CFrame.new(x1, GT + tinggi / 2, z1), KAYU_TUA, Enum.Material.Wood)
+   421→        part(m, Vector3.new(0.3, tinggi, 0.3), CFrame.new(x2, GT + tinggi / 2, z2), KAYU_TUA, Enum.Material.Wood)
+   422→        local panjang = math.sqrt((x2 - x1) ^ 2 + (z2 - z1) ^ 2)
+   423→        local yaw = math.atan2(z2 - z1, x2 - x1)
+   424→        local cfTali = CFrame.new((x1 + x2) / 2, GT + tinggi - 0.6, (z1 + z2) / 2) * CFrame.Angles(0, -yaw, 0)
+   425→        local tali = part(m, Vector3.new(panjang, 0.07, 0.07), cfTali, KAYU_TUA, Enum.Material.Wood)
+   426→        tali.CanCollide = false
+   427→        local n = 8
+   428→        for i = 1, n - 1 do
+   429→                local t = i / n
+   430→                local px = x1 + (x2 - x1) * t
+   431→                local pz = z1 + (z2 - z1) * t
+   432→                local kendur = math.sin(t * math.pi) * 0.5
+   433→                local bendera = part(m, Vector3.new(0.55, 0.85, 0.06), CFrame.new(px, GT + tinggi - 1.05 - kendur, pz) * CFrame.Angles(0, -yaw, 0), BENDERA[(i - 1) % #BENDERA + 1], Enum.Material.SmoothPlastic)
+   434→                bendera.CanCollide = false
+   435→        end
+   436→end
+   437→
+   438→local function sepeda(parent: Instance, x: number, z: number, yaw: number, warna: Color3)
+   439→        local m = Instance.new("Model")
+   440→        m.Name = "Sepeda"
+   441→        m.Parent = parent
+   442→        local cf = CFrame.new(x, GT, z) * CFrame.Angles(0, yaw, 0)
+   443→        local rodaTua = Color3.fromRGB(50, 50, 54)
+   444→        local r1 = part(m, Vector3.new(0.22, 1.5, 1.5), cf * CFrame.new(-0.95, 0.75, 0) * CFrame.Angles(0, math.rad(90), 0), rodaTua, Enum.Material.SmoothPlastic)
+   445→        r1.Shape = Enum.PartType.Cylinder
+   446→        r1.CanCollide = false
+   447→        local r2 = part(m, Vector3.new(0.22, 1.5, 1.5), cf * CFrame.new(0.95, 0.75, 0) * CFrame.Angles(0, math.rad(90), 0), rodaTua, Enum.Material.SmoothPlastic)
+   448→        r2.Shape = Enum.PartType.Cylinder
+   449→        r2.CanCollide = false
+   450→        local rangka = part(m, Vector3.new(2.3, 0.16, 0.16), cf * CFrame.new(0, 1.05, 0), warna, Enum.Material.SmoothPlastic)
+   451→        rangka.CanCollide = false
+   452→        local sadel = part(m, Vector3.new(0.75, 0.18, 0.45), cf * CFrame.new(-0.45, 1.5, 0), KAYU_TUA, Enum.Material.Wood)
+   453→        sadel.CanCollide = false
+   454→        local tiang = part(m, Vector3.new(0.14, 0.8, 0.14), cf * CFrame.new(1.0, 1.3, 0), warna, Enum.Material.SmoothPlastic)
+   455→        tiang.CanCollide = false
+   456→        local setang = part(m, Vector3.new(0.14, 0.14, 1.15), cf * CFrame.new(1.0, 1.72, 0), KAYU_TUA, Enum.Material.Wood)
+   457→        setang.CanCollide = false
+   458→end
+   459→
+   460→local function rakSepeda(parent: Instance, x: number, z: number, yaw: number)
+   461→        local m = Instance.new("Model")
+   462→        m.Name = "RakSepeda"
+   463→        m.Parent = parent
+   464→        local cf = CFrame.new(x, GT, z) * CFrame.Angles(0, yaw, 0)
+   465→        part(m, Vector3.new(7, 0.25, 0.3), cf * CFrame.new(0, 0.55, 1.05), KAYU_TUA, Enum.Material.Metal)
+   466→        part(m, Vector3.new(0.3, 0.55, 0.3), cf * CFrame.new(-3.2, 0.28, 1.05), KAYU_TUA, Enum.Material.Metal)
+   467→        part(m, Vector3.new(0.3, 0.55, 0.3), cf * CFrame.new(3.2, 0.28, 1.05), KAYU_TUA, Enum.Material.Metal)
+   468→        local warna = { Color3.fromRGB(196, 60, 50), Color3.fromRGB(70, 110, 180), Color3.fromRGB(80, 150, 80) }
+   469→        for i = -1, 1 do
+   470→                local sx = cf * CFrame.new(i * 2.3, 0, -0.35)
+   471→                local pos = sx.Position
+   472→                sepeda(m, pos.X, pos.Z, yaw, warna[i + 2])
+   473→        end
+   474→end
+   475→
+   476→local function kiosPasar(parent: Instance, x: number, z: number, yaw: number, warnaTeduh: Color3, hasil: { Color3 })
+   477→        local m = Instance.new("Model")
+   478→        m.Name = "KiosPasar"
+   479→        m.Parent = parent
+   480→        local cf = CFrame.new(x, GT, z) * CFrame.Angles(0, yaw, 0)
+   481→        for _, sx in ipairs({ -1, 1 }) do
+   482→                for _, sz in ipairs({ -1, 1 }) do
+   483→                        part(m, Vector3.new(0.28, 3.6, 0.28), cf * CFrame.new(sx * 2.2, 1.8, sz * 1.6), KAYU_TUA, Enum.Material.Wood)
+   484→                end
+   485→        end
+   486→        for i = 0, 4 do
+   487→                local strip = part(m, Vector3.new(5.2, 0.14, 0.8), cf * CFrame.new(0, 3.78, -1.55 + i * 0.82) * CFrame.Angles(math.rad(-8), 0, 0), (i % 2 == 0) and warnaTeduh or PUTIH, Enum.Material.SmoothPlastic)
+   488→                strip.CanCollide = false
+   489→        end
+   490→        part(m, Vector3.new(4.8, 0.9, 1.5), cf * CFrame.new(0, 0.45, 0.9), KAYU, Enum.Material.WoodPlanks)
+   491→        for i, w in ipairs(hasil) do
+   492→                local kotak = part(m, Vector3.new(1.05, 0.7, 0.9), cf * CFrame.new(-1.5 + (i - 1) * 1.5, 1.25, 0.9), KAYU, Enum.Material.WoodPlanks)
+   493→                kotak.CanCollide = false
+   494→                local isian = part(m, Vector3.new(0.7, 0.55, 0.6), cf * CFrame.new(-1.5 + (i - 1) * 1.5, 1.8, 0.9), w, Enum.Material.SmoothPlastic)
+   495→                isian.Shape = Enum.PartType.Ball
+   496→                isian.CanCollide = false
+   497→        end
+   498→end
+   499→
+   500→local function bungaLiar(parent: Instance, x: number, z: number, jumlah: number?)
+   501→        local n = jumlah or 3
+   502→        for i = 1, n do
+   503→                local dx = ((i * 37) % 9) - 4
+   504→                local dz = ((i * 53) % 9) - 4
+   505→                local batang = part(parent, Vector3.new(0.16, 0.55, 0.16), CFrame.new(x + dx, GT + 0.27, z + dz), RUMPUT_TUA, Enum.Material.Grass)
+   506→                batang.CanCollide = false
+   507→                local kepala = part(parent, Vector3.new(0.42, 0.42, 0.42), CFrame.new(x + dx, GT + 0.66, z + dz), BUNGA_LIAR[(i + math.floor(x) + math.floor(z)) % #BUNGA_LIAR + 1], Enum.Material.SmoothPlastic)
+   508→                kepala.Shape = Enum.PartType.Ball
+   509→                kepala.CanCollide = false
+   510→        end
+   511→end
+   512→
+   513→-- Papan petunjuk arah bertingkat (sebelumnya 4 papan bertumpuk saling
+   514→-- menembus; sekarang satu tiang, papan berjajar rapi).
+   515→local function papanPetunjuk(parent: Instance, x: number, z: number)
+   516→        local m = Instance.new("Model")
+   517→        m.Name = "PapanPetunjuk"
+   518→        m.Parent = parent
+   519→        part(m, Vector3.new(0.5, 9.2, 0.5), CFrame.new(x, GT + 4.6, z), KAYU_TUA, Enum.Material.Wood)
+   520→        local daftar = {
+   521→                { "SABANA (Utara)", 8.2 },
+   522→                { "STEPA (Timur)", 6.35 },
+   523→                { "KAMPUNG (Barat)", 4.5 },
+   524→                { "PERLADANGAN (Selatan)", 2.65 },
+   525→        }
+   526→        for _, d in ipairs(daftar) do
+   527→                local papan = part(m, Vector3.new(6.6, 1.55, 0.3), CFrame.new(x + 3.4, GT + d[2], z), KAYU, Enum.Material.Wood)
+   528→                teksPapan(papan, Enum.NormalId.Front, d[1])
+   529→                teksPapan(papan, Enum.NormalId.Back, d[1])
+   530→        end
+   531→end
+   532→
+   533→local function kawananBurung(parent: Instance, cx: number, cz: number)
+   534→        local m = Instance.new("Model")
+   535→        m.Name = "KawananBurung"
+   536→        m.Parent = parent
+   537→        for i = 1, 5 do
+   538→                local burung = part(m, Vector3.new(0.5, 0.3, 0.95), CFrame.new(cx, GT + 12 + i * 0.7, cz), Color3.fromRGB(72, 72, 80), Enum.Material.SmoothPlastic)
+   539→                burung.Name = "Burung"
+   540→                burung.CanCollide = false
+   541→                local radius = 9 + i * 2.2
+   542→                local laju = 0.4 + i * 0.06
+   543→                local fase = i * 1.25
+   544→                task.spawn(function()
+   545→                        local t = fase
+   546→                        while burung.Parent do
+   547→                                local dt = RunService.Heartbeat:Wait()
+   548→                                t += dt * laju
+   549→                                local y = GT + 12 + i * 0.7 + math.sin(t * 2.2) * 0.7
+   550→                                burung.CFrame = CFrame.new(cx + math.cos(t) * radius, y, cz + math.sin(t) * radius) * CFrame.Angles(0, math.pi - t, 0)
+   551→                        end
+   552→                end)
+   553→        end
+   554→end
+   555→
+   556→-- Suasana: sore hangat khas kepulauan + awan (aman jika layanan tak ada).
+   557→local function penerangan()
+   558→        pcall(function()
+   559→                local Lighting = game:GetService("Lighting")
+   560→                Lighting.ClockTime = 14.7
+   561→                Lighting.GeographicLatitude = 8
+   562→                Lighting.Brightness = 2.6
+   563→                Lighting.OutdoorAmbient = Color3.fromRGB(128, 124, 116)
+   564→                if not Lighting:FindFirstChildOfClass("Atmosphere") then
+   565→                        local atmo = Instance.new("Atmosphere")
+   566→                        atmo.Density = 0.32
+   567→                        atmo.Offset = 0.3
+   568→                        atmo.Color = Color3.fromRGB(199, 188, 172)
+   569→                        atmo.Decay = Color3.fromRGB(106, 98, 90)
+   570→                        atmo.Glare = 0.18
+   571→                        atmo.Haze = 1.7
+   572→                        atmo.Parent = Lighting
+   573→                end
+   574→        end)
+   575→        pcall(function()
+   576→                local terrain = workspace:FindFirstChildOfClass("Terrain")
+   577→                if terrain and not terrain:FindFirstChildOfClass("Clouds") then
+   578→                        local awan = Instance.new("Clouds")
+   579→                        awan.Cover = 0.6
+   580→                        awan.Density = 0.38
+   581→                        awan.Parent = terrain
+   582→                end
+   583→        end)
+   584→end
+   585→
+   586→local function kebunDemonstrasi(parent: Instance)
+   587→        local m = Instance.new("Model")
+   588→        m.Name = "KebunDemonstrasi"
+   589→        m.Parent = parent
+   590→        papanTeks(m, 96, 8, "KEBUN DEMONSTRASI", 0, 4)
+   591→        local z = 18
+   592→        for _, kat in ipairs(CropData.TokoBenihUrutan) do
+   593→                local daftar = CropData.TokoBenih[kat]
+   594→                local lebar = math.max(#daftar * 2.3 + 2, 10)
+   595→                part(m, Vector3.new(lebar, 0.4, 3.6), CFrame.new(112, GT + 0.2, z), TANAH, Enum.Material.Ground)
+   596→                papanTeks(m, 112 - lebar / 2 - 1.6, z + 1.4, kat, math.rad(-90), 2.6)
+   597→                local mulaiX = 112 - (lebar / 2) + 1.8
+   598→                for i, id in ipairs(daftar) do
+   599→                        tanamanDemo(m, mulaiX + (i - 1) * 2.3, z, id)
+   600→                end
+   601→                z += 5.4
+   602→        end
+   603→end
+   604→
+   605→local function permukiman(parent: Instance)
+   606→        local m = Instance.new("Model")
+   607→        m.Name = "Permukiman"
+   608→        m.Parent = parent
+   609→        papanTeks(m, -52, 42, "PERMUKIMAN", math.rad(-90), 4)
+   610→        rumahDesa(m, -78, 26, true)
+   611→        rumahDesa(m, -108, 30, false)
+   612→        rumahDesa(m, -78, 62, true)
+   613→        rumahDesa(m, -108, 66, false)
+   614→        -- Jaringan jalan setapak permukiman (grid masterplan):
+   615→        -- gang utara-selatan + jalan lintang antar-baris + jalan masuk rumah.
+   616→        part(m, Vector3.new(4, 0.2, 70), CFrame.new(-62, GT + 0.12, 51), JALAN, Enum.Material.Concrete).Name = "GangPermukiman"
+   617→        part(m, Vector3.new(60, 0.22, 4), CFrame.new(-90, GT + 0.12, 49), JALAN, Enum.Material.Concrete).Name = "GangPermukiman"
+   618→        part(m, Vector3.new(11, 0.14, 3), CFrame.new(-67.5, GT + 0.10, 30), JALAN, Enum.Material.Concrete)
+   619→        part(m, Vector3.new(11, 0.14, 3), CFrame.new(-67.5, GT + 0.10, 66), JALAN, Enum.Material.Concrete)
+   620→        part(m, Vector3.new(8, 0.14, 3), CFrame.new(-117, GT + 0.10, 30), JALAN, Enum.Material.Concrete)
+   621→        part(m, Vector3.new(8, 0.14, 3), CFrame.new(-117, GT + 0.10, 66), JALAN, Enum.Material.Concrete)
+   622→        part(m, Vector3.new(3, 0.18, 16), CFrame.new(-73, GT + 0.11, 39), JALAN, Enum.Material.Concrete)
+   623→        part(m, Vector3.new(3, 0.18, 16), CFrame.new(-117, GT + 0.11, 39), JALAN, Enum.Material.Concrete)
+   624→        BuildingKit.fenceLine(m, -92, 20, -92, 42, GT)
+   625→        BuildingKit.fenceLine(m, -122, 24, -122, 46, GT)
+   626→        BuildingKit.fenceLine(m, -92, 56, -92, 78, GT)
+   627→        BuildingKit.fenceLine(m, -122, 60, -122, 82, GT)
+   628→        part(m, Vector3.new(4, 0.3, 4), CFrame.new(-88, GT + 0.15, 32), TANAH, Enum.Material.Ground)
+   629→        tanamanDemo(m, -88, 32, "selada")
+   630→        part(m, Vector3.new(4, 0.3, 4), CFrame.new(-118, GT + 0.15, 38), TANAH, Enum.Material.Ground)
+   631→        tanamanDemo(m, -118, 38, "kubis")
+   632→        lampuTaman(m, -62, 22)
+   633→        lampuTaman(m, -62, 80)
+   634→        lampuTaman(m, -70, 44)
+   635→        lampuTaman(m, -100, 48)
+   636→        bangku(m, -58, 36, math.rad(-90))
+   637→        bungaLiar(m, -54, 30, 3)
+   638→        bungaLiar(m, -70, 58, 3)
+   639→        npc(m, -84, 44, math.rad(90), "Warga Desa", Color3.fromRGB(176, 92, 82))
+   640→        npc(m, -100, 52, math.rad(-90), "Kurir Desa", Color3.fromRGB(84, 120, 168))
+   641→end
+   642→
+   643→local function perbukitanAlam(parent: Instance)
+   644→        local m = Instance.new("Model")
+   645→        m.Name = "PerbukitanAlam"
+   646→        m.Parent = parent
+   647→        papanTeks(m, -44, 92, "PERBUKITAN ALAM", math.rad(180), 4)
+   648→        bukit(m, -62, 122, 74, 9)
+   649→        bukit(m, -112, 148, 96, 13)
+   650→        bukit(m, -152, 104, 62, 7)
+   651→        pohonAlam(m, -48, 98)
+   652→        pohonAlam(m, -80, 108, 1.15)
+   653→        pohonAlam(m, -96, 128)
+   654→        pohonAlam(m, -132, 122, 1.1)
+   655→        pohonAlam(m, -140, 152, 0.9)
+   656→        pohonAlam(m, -56, 152)
+   657→        pohonAlam(m, -170, 130, 1.2)
+   658→        batuAlam(m, -70, 92, 2.4)
+   659→        batuAlam(m, -116, 102, 3.2)
+   660→        batuAlam(m, -92, 162, 2)
+   661→        batuAlam(m, -160, 88, 2.6)
+   662→        kincirAngin(m, -122, 178, math.rad(135))
+   663→        sumur(m, -44, 76)
+   664→        gerobak(m, -60, 84, math.rad(20))
+   665→end
+   666→
+   667→local function alunAlun(parent: Instance)
+   668→        local m = Instance.new("Model")
+   669→        m.Name = "AlunAlun"
+   670→        m.Parent = parent
+   671→        part(m, Vector3.new(46, 0.25, 46), CFrame.new(55, GT + 0.12, -15), JALAN, Enum.Material.Concrete)
+   672→        -- lingkaran andalan di sekeliling air mancur
+   673→        local ring = part(m, Vector3.new(0.12, 19, 19), CFrame.new(55, GT + 0.33, -15) * CFrame.Angles(0, 0, math.rad(90)), TROTOAR, Enum.Material.Concrete)
+   674→        ring.Name = "PlazaRing"
+   675→        ring.Shape = Enum.PartType.Cylinder
+   676→        ring.CanCollide = false
+   677→        airMancur(m, 55, -15)
+   678→        kawananBurung(m, 55, -15)
+   679→        bangku(m, 43, -15, math.rad(-90))
+   680→        bangku(m, 67, -15, math.rad(90))
+   681→        bangku(m, 55, -3, math.rad(180))
+   682→        bangku(m, 55, -27, 0)
+   683→        lampuTaman(m, 38, -33)
+   684→        lampuTaman(m, 72, -33)
+   685→        lampuTaman(m, 38, 3)
+   686→        lampuTaman(m, 72, 3)
+   687→        -- bendera hias dua sisi air mancur
+   688→        benderaHias(m, 36, -15, 46, -15)
+   689→        benderaHias(m, 64, -15, 74, -15)
+   690→        -- rak sepeda pengunjung
+   691→        rakSepeda(m, 70, 2, 0)
+   692→        -- papan petunjuk arah bertingkat
+   693→        papanPetunjuk(m, 33, -23)
+   694→        part(m, Vector3.new(0.5, 9.4, 0.5), CFrame.new(33, GT + 4.7, -6), KAYU_TUA, Enum.Material.Wood)
+   695→        local papanSelamat = part(m, Vector3.new(9, 3, 0.35), CFrame.new(33, GT + 7.9, -6), KAYU, Enum.Material.Wood)
+   696→        teksPapan(papanSelamat, Enum.NormalId.Front, "SELAMAT DATANG DI DATARAN")
+   697→        teksPapan(papanSelamat, Enum.NormalId.Back, "SELAMAT DATANG DI DATARAN")
+   698→        local papanToko = part(m, Vector3.new(7.5, 2.4, 0.35), CFrame.new(33, GT + 4.9, -6), KAYU, Enum.Material.Wood)
+   699→        teksPapan(papanToko, Enum.NormalId.Front, "Toko Benih di Pusat Kota")
+   700→        teksPapan(papanToko, Enum.NormalId.Back, "Toko Benih di Pusat Kota")
+   701→        npc(m, 48, -8, math.rad(45), "Pengelola Alun-alun", Color3.fromRGB(96, 148, 92))
+   702→        npc(m, 62, 2, math.rad(135), "Bocah Alun-alun", Color3.fromRGB(208, 148, 70))
+   703→end
+   704→
+   705→local function jalurDanGerbang(parent: Instance, hooks)
+   706→        local m = Instance.new("Model")
+   707→        m.Name = "JalurGerbang"
+   708→        m.Parent = parent
+   709→
+   710→        -- === Jaringan jalan aspal masterplan ===
+   711→        -- Barat -> Kampung
+   712→        local _, hB, cxB, czB, lenB = jalanAspal(m, -170, -15, 35, -15, { nama = "Barat" })
+   713→        hiasJalan(m, hB, cxB, czB, lenB, 12, { { -19, 47 }, { -174, -160 } })
+   714→        -- Timur -> Stepa (melintasi jembatan sungai)
+   715→        local _, hT, cxT, czT, lenT = jalanAspal(m, 77, -15, 172, -15, { nama = "Timur" })
+   716→        hiasJalan(m, hT, cxT, czT, lenT, 12, { { 76, 90 }, { 104, 116 }, { 160, 174 } })
+   717→        -- Utara -> Sabana
+   718→        local _, hU, cxU, czU, lenU = jalanAspal(m, 55, -172, 55, -37, { nama = "Utara" })
+   719→        hiasJalan(m, hU, cxU, czU, lenU, 12, { { -48, -36 }, { -176, -164 } })
+   720→        -- Selatan -> Perladangan
+   721→        local _, hS, cxS, czS, lenS = jalanAspal(m, 55, 6, 55, 172, { nama = "Selatan" })
+   722→        hiasJalan(m, hS, cxS, czS, lenS, 12, { { 6, 20 }, { 160, 172 } })
+   723→        -- Penghubung spawn -> alun-alun (di atas jalur lama, sedikit lebih
+   724→        -- tebal agar rapi menimpa pertemuan jalan)
+   725→        local _, hP, cxP, czP, lenP = jalanAspal(m, -17, -7, 45, -7, { nama = "Penghubung", lebar = 10, tebal = 0.3 })
+   726→        hiasJalan(m, hP, cxP, czP, lenP, 10, { { -17, 10 }, { 30, 45 } })
+   727→        -- Jalan pusat kota menuju Toko Benih
+   728→        jalanAspal(m, 0, -44, 0, -33, { nama = "PusatKota", lebar = 10 })
+   729→
+   730→        -- Zebra cross di keempat mulut jalan alun-alun
+   731→        zebraCross(m, 26, -15, true)
+   732→        zebraCross(m, 84, -15, true)
+   733→        zebraCross(m, 55, -44, false)
+   734→        zebraCross(m, 55, 14, false)
+   735→
+   736→        -- Jalur setapak masuk Kebun Demonstrasi dari jalan Timur
+   737→        part(m, Vector3.new(4, 0.2, 23), CFrame.new(110, GT + 0.12, 2.5), JALAN, Enum.Material.Concrete).Name = "SetapakKebun"
+   738→
+   739→        gerbangKawasan(m, -170, -15, math.rad(90), "Kampung", "kampung", KAYU_TUA, hooks)
+   740→        gerbangKawasan(m, 55, -172, 0, "Sabana", "sabana", KERING, hooks)
+   741→        gerbangKawasan(m, 172, -15, math.rad(90), "Stepa", "stepa", BATU, hooks)
+   742→        gerbangKawasan(m, 55, 172, 0, "Perladangan", "perladangan", TANAH, hooks)
+   743→        BuildingKit.fenceLine(m, -174, -26, -166, -26, GT)
+   744→        BuildingKit.fenceLine(m, -174, -4, -166, -4, GT)
+   745→        part(m, Vector3.new(4, 0.3, 4), CFrame.new(-162, GT + 0.15, -24), TANAH, Enum.Material.Ground)
+   746→        tanamanDemo(m, -162, -24, "kacang_polong")
+   747→        part(m, Vector3.new(6, 0.15, 6), CFrame.new(48, GT + 0.1, -162), KERING, Enum.Material.Ground)
+   748→        part(m, Vector3.new(5, 0.15, 5), CFrame.new(63, GT + 0.1, -158), KERING, Enum.Material.Ground)
+   749→        batuAlam(m, 44, -158, 1.8)
+   750→        batuAlam(m, 166, -26, 2.2)
+   751→        batuAlam(m, 178, -6, 1.6)
+   752→        -- petak contoh sayur di tepi jalan Selatan (pindah dari tengah jalan)
+   753→        part(m, Vector3.new(8, 0.3, 2), CFrame.new(44, GT + 0.2, 164), TANAH, Enum.Material.Ground)
+   754→        part(m, Vector3.new(8, 0.3, 2), CFrame.new(66, GT + 0.2, 164), TANAH, Enum.Material.Ground)
+   755→        part(m, Vector3.new(8, 0.3, 2), CFrame.new(44, GT + 0.2, 158), TANAH, Enum.Material.Ground)
+   756→        tanamanDemo(m, 44, 164, "selada")
+   757→        tanamanDemo(m, 66, 164, "brokoli")
+   758→        tanamanDemo(m, 44, 158, "seledri")
+   759→end
+   760→
+   761→-- Pasar tani di tepi jalan Selatan: 4 kios beratap garis + pedagang.
+   762→local function pasarTani(parent: Instance)
+   763→        local m = Instance.new("Model")
+   764→        m.Name = "PasarTani"
+   765→        m.Parent = parent
+   766→        papanTeks(m, 46, 36, "PASAR TANI", math.rad(90), 6.5)
+   767→        local hijau = Color3.fromRGB(76, 140, 86)
+   768→        local merah = Color3.fromRGB(176, 84, 66)
+   769→        kiosPasar(m, 44, 18, math.rad(90), hijau, { Color3.fromRGB(96, 148, 92), Color3.fromRGB(134, 168, 72), Color3.fromRGB(196, 178, 108) })
+   770→        kiosPasar(m, 44, 28, math.rad(90), merah, { Color3.fromRGB(232, 96, 84), Color3.fromRGB(240, 196, 84), Color3.fromRGB(150, 96, 60) })
+   771→        kiosPasar(m, 66, 18, math.rad(-90), merah, { Color3.fromRGB(232, 96, 84), Color3.fromRGB(134, 168, 72), Color3.fromRGB(240, 196, 84) })
+   772→        kiosPasar(m, 66, 28, math.rad(-90), hijau, { Color3.fromRGB(96, 148, 92), Color3.fromRGB(196, 178, 108), Color3.fromRGB(150, 96, 60) })
+   773→        npc(m, 44, 23, math.rad(90), "Pedagang Sayur", Color3.fromRGB(96, 148, 92))
+   774→        npc(m, 66, 23, math.rad(-90), "Pedagang Buah", Color3.fromRGB(208, 148, 70))
+   775→        npc(m, 108, 4, math.rad(-90), "Penjaga Kebun", Color3.fromRGB(120, 128, 88))
+   776→        npc(m, 100, 46, math.rad(180), "Petani Muda", Color3.fromRGB(88, 108, 160))
+   777→        npc(m, 8, -52, math.rad(-90), "Penjaga Toko", Color3.fromRGB(150, 96, 120))
+   778→        -- sepeda terparkir di trotoar penghubung dekat spawn
+   779→        rakSepeda(m, 16, -2.4, 0)
+   780→        bungaLiar(m, 10, -18, 3)
+   781→end
+   782→
+   783→local function sungaiJembatan(parent: Instance)
+   784→        local m = Instance.new("Model")
+   785→        m.Name = "SungaiJembatan"
+   786→        m.Parent = parent
+   787→        local air = part(m, Vector3.new(16, 0.35, 400), CFrame.new(150, GT - 0.08, 0), AIR, Enum.Material.Glass, 0.35)
+   788→        air.CanCollide = false
+   789→        part(m, Vector3.new(22, 0.6, 12), CFrame.new(150, GT + 0.4, -15), KAYU, Enum.Material.WoodPlanks)
+   790→        part(m, Vector3.new(22, 0.9, 0.45), CFrame.new(150, GT + 1.35, -20.6), KAYU_TUA, Enum.Material.Wood)
+   791→        part(m, Vector3.new(22, 0.9, 0.45), CFrame.new(150, GT + 1.35, -9.4), KAYU_TUA, Enum.Material.Wood)
+   792→        pohonAlam(m, 138, 40)
+   793→        pohonAlam(m, 166, -60, 1.1)
+   794→        pohonAlam(m, 138, -80)
+   795→        batuAlam(m, 160, 60, 2.4)
+   796→        batuAlam(m, 140, 100, 1.8)
+   797→        gerobak(m, 143, 12, math.rad(-30))
+   798→end
+   799→
+   800→-- Titik bunga liar di area rumput (dipilih manual agar tidak menginjak
+   801→-- jalan maupun bangunan).
+   802→local BUNGA_TITIK = {
+   803→        { 24, -32 }, { 20, 2 }, { 26, 6 }, { -14, 30 }, { 16, 26 }, { -16, 12 },
+   804→        { 72, 40 }, { 66, 56 }, { 42, 30 }, { 38, 52 }, { 44, 70 }, { -56, 22 },
+   805→        { -52, 66 }, { 90, 34 }, { 134, 24 }, { 40, -60 }, { 72, -56 },
+   806→        { 36, -100 }, { 72, -110 }, { -30, 10 }, { -40, -34 },
+   807→}
+   808→
+   809→function DataranBuilder.build(hooks)
+   810→        local existing = workspace:FindFirstChild("Dataran")
+   811→        if existing then
+   812→                existing:Destroy()
+   813→        end
+   814→        local folder = Instance.new("Folder")
+   815→        folder.Name = "Dataran"
+   816→        folder.Parent = workspace
+   817→        jalurDanGerbang(folder, hooks)
+   818→        alunAlun(folder)
+   819→        permukiman(folder)
+   820→        pasarTani(folder)
+   821→        kebunDemonstrasi(folder)
+   822→        perbukitanAlam(folder)
+   823→        sungaiJembatan(folder)
+   824→        for _, t in ipairs(BUNGA_TITIK) do
+   825→                bungaLiar(folder, t[1], t[2], 3)
+   826→        end
+   827→        penerangan()
+   828→        return folder
+   829→end
+   830→
+   831→return DataranBuilder
+   832→
