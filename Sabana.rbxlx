@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
-  <Item class="Workspace" referent="RBX1017">
+  <Item class="Workspace" referent="RBX1282">
     <Properties>
       <string name="Name">Workspace</string>
       <bool name="StreamingEnabled">true</bool>
     </Properties>
-    <Item class="SpawnLocation" referent="RBX1018">
+    <Item class="SpawnLocation" referent="RBX1283">
       <Properties>
         <string name="Name">SpawnSabana</string>
         <bool name="Anchored">true</bool>
@@ -24,15 +24,15 @@
         <token name="BackSurface">0</token>
       </Properties>
     </Item>
-    <Item class="Folder" referent="RBX1019">
+    <Item class="Folder" referent="RBX1284">
       <Properties>
         <string name="Name">Gerbang</string>
       </Properties>
-      <Item class="Model" referent="RBX1020">
+      <Item class="Model" referent="RBX1285">
         <Properties>
           <string name="Name">GerbangDataran</string>
         </Properties>
-        <Item class="Part" referent="RBX1021">
+        <Item class="Part" referent="RBX1286">
           <Properties>
             <string name="Name">PilarGerbang</string>
             <bool name="Anchored">true</bool>
@@ -51,7 +51,7 @@
             <token name="BackSurface">0</token>
           </Properties>
         </Item>
-        <Item class="Part" referent="RBX1022">
+        <Item class="Part" referent="RBX1287">
           <Properties>
             <string name="Name">PilarGerbang</string>
             <bool name="Anchored">true</bool>
@@ -70,7 +70,7 @@
             <token name="BackSurface">0</token>
           </Properties>
         </Item>
-        <Item class="Part" referent="RBX1023">
+        <Item class="Part" referent="RBX1288">
           <Properties>
             <string name="Name">BalokGerbang</string>
             <bool name="Anchored">true</bool>
@@ -89,7 +89,7 @@
             <token name="BackSurface">0</token>
           </Properties>
         </Item>
-        <Item class="Part" referent="RBX1024">
+        <Item class="Part" referent="RBX1289">
           <Properties>
             <string name="Name">PapanGerbang</string>
             <bool name="Anchored">true</bool>
@@ -107,12 +107,12 @@
             <token name="FrontSurface">0</token>
             <token name="BackSurface">0</token>
           </Properties>
-          <Item class="SurfaceGui" referent="RBX1025">
+          <Item class="SurfaceGui" referent="RBX1290">
             <Properties>
               <token name="Face">5</token>
               <bool name="AlwaysOnTop">false</bool>
             </Properties>
-            <Item class="TextLabel" referent="RBX1026">
+            <Item class="TextLabel" referent="RBX1291">
               <Properties>
                 <string name="Name">Teks</string>
                 <UDim2 name="Size"><XS>1</XS><XO>0</XO><YS>1</YS><YO>0</YO></UDim2>
@@ -127,12 +127,12 @@
               </Properties>
             </Item>
           </Item>
-          <Item class="SurfaceGui" referent="RBX1027">
+          <Item class="SurfaceGui" referent="RBX1292">
             <Properties>
               <token name="Face">2</token>
               <bool name="AlwaysOnTop">false</bool>
             </Properties>
-            <Item class="TextLabel" referent="RBX1028">
+            <Item class="TextLabel" referent="RBX1293">
               <Properties>
                 <string name="Name">Teks</string>
                 <UDim2 name="Size"><XS>1</XS><XO>0</XO><YS>1</YS><YO>0</YO></UDim2>
@@ -148,7 +148,7 @@
             </Item>
           </Item>
         </Item>
-        <Item class="Part" referent="RBX1029">
+        <Item class="Part" referent="RBX1294">
           <Properties>
             <string name="Name">PenghalangGerbang</string>
             <bool name="Anchored">true</bool>
@@ -170,7 +170,7 @@
       </Item>
     </Item>
   </Item>
-  <Item class="Lighting" referent="RBX1030">
+  <Item class="Lighting" referent="RBX1295">
     <Properties>
       <string name="Name">Lighting</string>
       <Color3 name="Ambient"><R>0.64</R><G>0.57</G><B>0.45</B></Color3>
@@ -181,7 +181,7 @@
       <bool name="GlobalShadows">true</bool>
       <token name="Technology">3</token>
     </Properties>
-    <Item class="Atmosphere" referent="RBX1031">
+    <Item class="Atmosphere" referent="RBX1296">
       <Properties>
         <string name="Name">AtmosferSabana</string>
         <float name="Density">0.52</float>
@@ -193,11 +193,11 @@
       </Properties>
     </Item>
   </Item>
-  <Item class="ReplicatedStorage" referent="RBX1032">
+  <Item class="ReplicatedStorage" referent="RBX1297">
     <Properties>
       <string name="Name">ReplicatedStorage</string>
     </Properties>
-    <Item class="ModuleScript" referent="RBX1033">
+    <Item class="ModuleScript" referent="RBX1298">
       <Properties>
         <string name="Name">GameConfig</string>
         <ProtectedString name="Source">local GameConfig = {}
@@ -328,7 +328,7 @@ return GameConfig
 </ProtectedString>
       </Properties>
     </Item>
-    <Item class="ModuleScript" referent="RBX1034">
+    <Item class="ModuleScript" referent="RBX1299">
       <Properties>
         <string name="Name">Remotes</string>
         <ProtectedString name="Source">local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -377,11 +377,11 @@ return Remotes
       </Properties>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="RBX1035">
+  <Item class="ServerScriptService" referent="RBX1300">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="ModuleScript" referent="RBX1036">
+    <Item class="ModuleScript" referent="RBX1301">
       <Properties>
         <string name="Name">RateLimit</string>
         <ProtectedString name="Source">local RateLimit = {}
@@ -412,7 +412,7 @@ return RateLimit
 </ProtectedString>
       </Properties>
     </Item>
-    <Item class="ModuleScript" referent="RBX1037">
+    <Item class="ModuleScript" referent="RBX1302">
       <Properties>
         <string name="Name">DataService</string>
         <ProtectedString name="Source">local DataStoreService = game:GetService("DataStoreService")
@@ -593,7 +593,7 @@ return DataService
 </ProtectedString>
       </Properties>
     </Item>
-    <Item class="Script" referent="RBX1038">
+    <Item class="Script" referent="RBX1303">
       <Properties>
         <string name="Name">GerbangTeleport</string>
         <ProtectedString name="Source">local TeleportService = game:GetService("TeleportService")
@@ -669,7 +669,7 @@ end)
         <bool name="Disabled">false</bool>
       </Properties>
     </Item>
-    <Item class="Script" referent="RBX1039">
+    <Item class="Script" referent="RBX1304">
       <Properties>
         <string name="Name">TerrainDunia</string>
         <ProtectedString name="Source">local Terrain = workspace:WaitForChild("Terrain")
@@ -678,7 +678,7 @@ local DASAR_M = "Sand"
 local BUKIT = {{x=-243.8,z=-148.8,r=79.2,t=5.9,m="Grass"}, {x=339.1,z=-83.7,r=63.4,t=5,m="Grass"}, {x=365.9,z=153.4,r=86.5,t=8.1,m="Grass"}, {x=195.1,z=-242.2,r=90.6,t=7.4,m="Grass"}, {x=173,z=175.2,r=84.8,t=7.3,m="Grass"}, {x=-388.9,z=259.2,r=78.6,t=7.2,m="Grass"}, {x=40.5,z=-421.5,r=59,t=7.7,m="Grass"}, {x=19,z=166,r=65.2,t=5.3,m="Grass"}, {x=-174.2,z=309.9,r=73.9,t=6.4,m="Grass"}, {x=-322.3,z=-241.5,r=75.7,t=6,m="Grass"}, {x=40.8,z=311.4,r=70.7,t=6.9,m="Grass"}, {x=57.9,z=66.6,r=60.9,t=7.2,m="Grass"}}
 local TUMPUK = {{x=-149,z=-325.1,sx=29.7,sz=51.3,m="Ground"}, {x=-223.7,z=236.6,sx=25.7,sz=39.1,m="Ground"}, {x=267.1,z=76.4,sx=36.2,sz=60.6,m="Ground"}, {x=113.8,z=36.2,sx=24.2,sz=27.6,m="Ground"}, {x=325.9,z=363,sx=26.9,sz=49,m="Ground"}, {x=-402.3,z=-292,sx=28.2,sz=55.7,m="Ground"}, {x=419.6,z=202.4,sx=33.7,sz=29.2,m="Ground"}, {x=185.7,z=-52.8,sx=63.1,sz=62.4,m="Ground"}, {x=-355.7,z=-248,sx=63.7,sz=34,m="Ground"}, {x=373.1,z=243.3,sx=54.1,sz=31.1,m="Ground"}, {x=-186.6,z=81.3,sx=30.8,sz=63.3,m="Ground"}, {x=-310.8,z=373.2,sx=35.5,sz=61.4,m="Ground"}}
 local SUNGAI = {}
-local GIGI = {{x=-377.8,z=-515.7,y=92,d=14.6}, {x=-268,z=-503,y=92,d=14.5}, {x=-204.1,z=-509.6,y=92,d=9.3}, {x=-78.4,z=-505.7,y=92,d=12.9}, {x=39.7,z=-506.8,y=92,d=17.6}, {x=169.7,z=-515.9,y=92,d=16.8}, {x=291.5,z=-509.1,y=92,d=11.3}, {x=398.2,z=-511.5,y=92,d=13.8}, {x=-408.8,z=519.2,y=92,d=13}, {x=-261.9,z=503.6,y=92,d=11.6}, {x=-178.4,z=505.6,y=92,d=14}, {x=-74.8,z=511.8,y=92,d=14.7}, {x=81.7,z=502.9,y=92,d=11.5}, {x=195.4,z=518.6,y=92,d=14.4}, {x=283.6,z=509.2,y=92,d=14.4}, {x=386.7,z=511.5,y=92,d=12.6}, {x=-520.6,z=-373.3,y=92,d=17.5}, {x=-507.8,z=-313.4,y=92,d=13.5}, {x=-504.1,z=-179.6,y=92,d=14.6}, {x=-511.9,z=-68.4,y=92,d=9}, {x=-514.5,z=31.1,y=92,d=16.9}, {x=-510.2,z=153.2,y=92,d=17.5}, {x=-514.5,z=256.4,y=92,d=10.3}, {x=-521.4,z=389.5,y=92,d=16.1}, {x=520.3,z=-402.9,y=92,d=11.1}, {x=509.6,z=-308.8,y=92,d=17.7}, {x=515.8,z=-152.1,y=92,d=9}, {x=506.5,z=-72,y=92,d=15.5}, {x=520.2,z=29.8,y=92,d=9.8}, {x=505.4,z=138.1,y=92,d=15.2}, {x=514.1,z=293.3,y=92,d=10.8}, {x=518.6,z=425.5,y=92,d=11}}
+local GIGI = {{x=-426.2,z=-511.6,y=92,d=9.7}, {x=-301.6,z=-520.5,y=92,d=15}, {x=-181.1,z=-503.9,y=92,d=14.7}, {x=-23.4,z=-516.3,y=92,d=16.4}, {x=82.1,z=-509.4,y=92,d=11.6}, {x=180.8,z=-510.6,y=92,d=17.8}, {x=311.8,z=-519.1,y=92,d=13}, {x=400.9,z=-502.5,y=92,d=15.2}, {x=-410.2,z=514.9,y=92,d=11.6}, {x=-264.2,z=512.5,y=92,d=11.2}, {x=-157.4,z=513,y=92,d=12.3}, {x=-70.8,z=518,y=92,d=16.4}, {x=33.9,z=515,y=92,d=12.2}, {x=202.1,z=518.7,y=92,d=13.9}, {x=310.7,z=503.9,y=92,d=15.2}, {x=389.7,z=506.3,y=92,d=15}, {x=-507.5,z=-419,y=92,d=10.6}, {x=-506.4,z=-300.5,y=92,d=9.9}, {x=-505.5,z=-183.6,y=92,d=13.3}, {x=-504.6,z=-40.3,y=92,d=16.4}, {x=-503.2,z=61.2,y=92,d=16}, {x=-506.8,z=146.5,y=92,d=15.4}, {x=-518.8,z=254.3,y=92,d=17.4}, {x=-518.7,z=368.8,y=92,d=12.3}, {x=509.4,z=-391.6,y=92,d=10.5}, {x=519.1,z=-269.6,y=92,d=10.7}, {x=504.1,z=-192.5,y=92,d=10.8}, {x=520.2,z=-44.5,y=92,d=15.5}, {x=507.8,z=71.9,y=92,d=11.8}, {x=513.6,z=168.8,y=92,d=15.1}, {x=507.9,z=257.7,y=92,d=12.9}, {x=510.2,z=418.1,y=92,d=17.3}}
 local TEPI = {jrk = 496, tbl = 48, tng = 90}
 local RIVER = {lbr = 18, pahat = 8}
 
@@ -725,7 +725,7 @@ end
         <bool name="Disabled">false</bool>
       </Properties>
     </Item>
-    <Item class="Script" referent="RBX1040">
+    <Item class="Script" referent="RBX1305">
       <Properties>
         <string name="Name">InteraksiTempat</string>
         <ProtectedString name="Source">local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -797,11 +797,11 @@ end)
       </Properties>
     </Item>
   </Item>
-  <Item class="StarterGui" referent="RBX1041">
+  <Item class="StarterGui" referent="RBX1306">
     <Properties>
       <string name="Name">StarterGui</string>
     </Properties>
-    <Item class="LocalScript" referent="RBX1042">
+    <Item class="LocalScript" referent="RBX1307">
       <Properties>
         <string name="Name">TempatClient</string>
         <ProtectedString name="Source">local Players = game:GetService("Players")

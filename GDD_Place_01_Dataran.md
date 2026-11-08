@@ -502,3 +502,68 @@ hanya untuk aksen kecil (lampu, tanda identitas benih di katalog).
   (kabut menutup tepi peta), PointLight hanya pada lampu jalan/lampu gantung.
 - Target uji: ponsel menengah stabil tanpa patah-patah dan tanpa crash; tepi
   peta tidak terlihat (tebing batu di radius 496 + kabut).
+
+==================================================
+
+9. MASTERPLAN DAN PRINSIP PENEMPATAN (REVISI 8 NOV 2026)
+
+==================================================
+
+Arahan pemilik dunia: dunia sebelumnya "masih mentah" — objek disebar tanpa desain,
+banyak yang tumpang tindih, bangunan seperti taman kanak-kanak, papan asal ada.
+Revisi ini menerapkan desain arsitektural yang terarah:
+
+9.1 POROS DAN DISTRIK
+
+- Poros civic timur-barat: alun-alun (r24) di tengah; boulevard 24 stud ke empat
+  gerbang; jalan sekunder 14 memancar dari tepi alun-alun ke tiap distrik.
+- Distrik menghadap jalan dengan mundur (setback) seragam: Toko Benih + pelataran
+  cobble di barat; Dusun (6 rumah dua lantai + gudang, jalan desa L dengan rumah
+  berjajar menghadap jalan, taman depan berpagar) di timur laut; Kebun Demonstrasi
+  dengan gerbang kayu beratap di timur; promenade tepi sungai + dermaga di selatan.
+- Landmark tinggi terarah: kincir angin di puncak bukit barat laut; menara gerbang
+  terlihat dari ujung tiap boulevard.
+- Kedatangan: pelataran cobble spawn + dua lampu + TOTEM penunjuk (satu tiang, empat
+  papan arah menghadap gerbangnya masing-masing) — pengganti empat papan kecil acak.
+
+9.2 SISTEM OKUPANSI (LARANG TUMPANG TINDIH)
+
+- Setiap penempatan wajib lolos pemeriksaan: lingkaran terpakai (OKUP), kotak
+  bangunan (RECTS), segmen jalan (ROADS), alur sungai (buffer 14), batas tepi 470.
+- Furnitur yang memang berdiri di atas pelataran memakai jalur khusus (di_jalan).
+- Objek yang tidak lolos DILEWATI, bukan dipaksakan — hasil akhir dijamin bebas
+  tumpang tindih dan papan tidak pernah tertutup objek lain.
+
+9.3 KOMPOSISI TUMBUHAN (TANPA SEBAR ACAK)
+
+- Allee: pohon identik berjajar di kedua sisi tiap boulevard (jarak 34 stud, tepi
+  trotoar 16 stud) — terputus otomatis di persimpangan dan gerbang.
+- Gerombolan: 4 klaster pohon pada bukit (cincin 4 pohon radius 30).
+- Dusun: satu pohon di belakang tiap rumah + bunga pucat di taman depan berpagar.
+- Promenade: pad lingkaran setiap belokan dengan bangku menghadap sungai, lampu,
+  dan cincin bunga.
+- Bed geometris: dua bed di pelataran toko, cincin bunga keliling air mancur.
+
+9.4 BANGUNAN BERARSITEKTUR (SATU GAYA, RASIO SERIUS)
+
+- Plinth batu 1,5 stud, dinding berbukaan dengan kaca + ambang jendela, pilaster
+  sudut kayu, lis dinding atas (cornice), atap pelana 30 derajat + puncak atap,
+  pintu berdaun kayu + pijakan batu, cerobong bata beratap batu.
+- Rumah dusun: DUA LANTAI (lantai dua + jendela atas), 16x20, menghadap jalan desa.
+- Toko Benih: etalase jendela lebar + kanopi + papan nama + cerobong + halaman.
+- Gudang: pintu besar 7 stud + dua jendela tinggi.
+
+9.5 SISTEM PAPAN
+
+- Papan dirancang: dua tiang di BELAKANG bidang teks, balok caping, atap dua bidang,
+  pijakan batu; papan informasi utama 16x7 di tepi barat laut alun-alun.
+- Zona baca: radius 9-10 stud di depan tiap papan dicadangkan kosong.
+- Teks lengkap dan bermakna (bukan asal ada): papan informasi 5 baris; papan petak
+  menjelaskan cara tanam-panen; papan gerbang kebun menandai pintu masuk kebun.
+
+9.6 PROMENADE SUNGAI
+
+- Tiga segmen jalan setapak 6 stud di tepi utara sungai (offset 16 stud dari poros
+  sungai) + 5 pad belokan; menghubungkan JalanSungai, dermaga, dan sisi barat.
+- Jembatan kayu boulevard selatan menyeberangi sungai di (0,190) — poros tetap
+  lurus sampai gerbang Perladangan.
