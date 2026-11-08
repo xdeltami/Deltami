@@ -8,7 +8,7 @@ local function tambahPrompt(induk, aksi, objek)
 	prompt.ActionText = aksi
 	prompt.ObjectText = objek
 	prompt.HoldDuration = 0.3
-	prompt.MaxActivationDistance = 12
+	prompt.MaxActivationDistance = 16
 	prompt.RequiresLineOfSight = false
 	prompt.Parent = induk
 	return prompt

@@ -34,7 +34,7 @@ task.spawn(function()
 			prompt.ActionText = "Masuk Gerbang"
 			prompt.ObjectText = "Menuju " .. nama
 			prompt.HoldDuration = 0.5
-			prompt.MaxActivationDistance = 14
+			prompt.MaxActivationDistance = 18
 			prompt.RequiresLineOfSight = false
 			prompt.Parent = papan
 			prompt.Triggered:Connect(function(player)

@@ -435,3 +435,70 @@ Place 01 — Dataran
 
 Dokumen dasar perancangan dan acuan pembangunan di Roblox Studio.
 ```
+
+==================================================
+
+8. STANDAR VISUAL, SKALA, DAN BATAS PERFORMA
+
+==================================================
+
+Bagian ini adalah lampiran standar implementasi (arahan pemilik dunia, 8 November 2026).
+Semua pembangunan Dataran dan kawasan lain wajib mengikuti nilai di bawah agar dunia
+terasa seperti replikasi dunia nyata: nyaman dilihat, nyaman dimainkan, nyaman dipahami.
+
+8.1 PALET WARNA
+
+Prinsip: warna bumi, hijau redup, dan abu untuk semua permukaan besar. Warna cerah
+hanya untuk aksen kecil (lampu, tanda identitas benih di katalog).
+
+- Rumput dasar : hijau zaitun redup RGB(88, 106, 62)
+- Tanah/jalan tanah : coklat tanah RGB(122, 100, 72) dan RGB(134, 112, 82)
+- Pasir : krem abu RGB(182, 168, 138)
+- Batu/tebing : abu batu RGB(122, 120, 114) dan RGB(104, 102, 98)
+- Alun-alun : cobble abu RGB(150, 148, 140), garis tepi RGB(130, 128, 122)
+- Boulevard : jalan inti abu gelap RGB(108, 106, 102), trotoar RGB(146, 140, 128)
+- Dinding bangunan : plester hangat RGB(196, 186, 168) / RGB(186, 174, 154)
+- Atap : tanah liat redup RGB(118, 88, 70) — dilarang merah/oranye menyala
+- Kayu : coklat tua RGB(92, 70, 50) dan RGB(122, 98, 68)
+- Air : biru kehijauan redup RGB(86, 118, 132), transparansi 0,2-0,3
+- Dedaunan : RGB(58, 84, 48), RGB(70, 96, 54), RGB(48, 72, 42)
+- Aksen terang (satu-satunya) : lampu hangat RGB(255, 214, 150)
+- Dilarang: warna neon selain lampu, bangku/konstruksi merah-pink-oranye,
+  kotak warna variasi rumput di atas baseplate.
+
+8.2 MATERIAL
+
+- Satu bahasa material per dunia: Slate (batu), Cobblestone (plaza/boulevard),
+  Concrete (trotoar), Ground (jalan tanah), Grass (terrain), Wood/WoodPlanks
+  (kayu), Brick (atap tanah liat), Glass (jendela), Water (air), Neon hanya lampu.
+- Tanah, bukit, sungai, dan tebing dibangun dengan TERRAIN asli Roblox
+  (script TerrainDunia, fill runtime: bukit dome, alur sungai berbasi batu,
+  tebing batu penutup tepi peta). Baseplate datar dengan kotak warna dilarang.
+- Tekstur datang dari material terrain/part, bukan dari banyak part kecil.
+
+8.3 SKALA DAN HIERARKI JALAN
+
+- Karakter ~5 stud. Pintu 6x10 stud, dinding 20 stud, tebal 1 stud.
+- Alun-alun: lingkaran diameter 48-52 stud dengan air mancur r18.
+- Boulevard gerbang (4 jalur utama): total 24 stud = jalan inti 16 + trotoar 4x2.
+- Jalan sekunder ke fasilitas: 14 stud. Jalan lokal kampung/gudang: 6-8 stud.
+- Bangunan seragam: Toko 30x40, rumah desa 16x20, gudang 24x28. Bukit rendah
+  10-16 stud. Pohon 7-11 stud. Gerbang: pilar 3x20x3, papan nama di y 12,5.
+- Semua tempat luar (Kampung, Sabana, Stepa, Perladangan) HANYA hamparan kosong
+  + satu gerbang kembali ke Dataran (pilar, balok, papan, penghalang tak kasat)
+  + spawn. Detail isi kawasan tersebut belum ditentukan dan tidak boleh dibuat
+  sebelum dijelaskan pemilik dunia.
+
+8.4 BATAS PERFORMA
+
+- StreamingEnabled aktif di semua place.
+- Part statis dijemur: tanpa part dekoratif duplikat berlebihan; Dataran <= 1100
+  part; kawasan luar <= 30 part (gerbang + spawn).
+- Script: tanpa loop per objek; animasi hanya kincir angin (1 loop kecil);
+  tanam-panen via task.delay.
+- Terrain diisi runtime ~100 operasi FillRegion/FillBall/FillBlock (selesai < 1
+  detik saat server mulai) — bukan ribuan part.
+- Pencahayaan: ShadowMap, Atmosphere Density 0,42-0,52 + Haze 2,0-2,6 per place
+  (kabut menutup tepi peta), PointLight hanya pada lampu jalan/lampu gantung.
+- Target uji: ponsel menengah stabil tanpa patah-patah dan tanpa crash; tepi
+  peta tidak terlihat (tebing batu di radius 496 + kabut).

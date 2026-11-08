@@ -31,8 +31,8 @@ local hud = buat("ScreenGui", {Name = "MicdaHud", ResetOnSpawn = false, IgnoreGu
 
 local pil = buat("TextButton", {
 	Name = "PilMicda",
-	AnchorPoint = Vector2.new(0.5, 0),
-	Position = UDim2.new(0.5, 0, 0, 70),
+	AnchorPoint = Vector2.new(0, 0),
+	Position = UDim2.new(0, 12, 0, 70),
 	Size = UDim2.new(0, 220, 0, 44),
 	BackgroundColor3 = Color3.fromRGB(24, 26, 22),
 	BackgroundTransparency = 0.12,
@@ -86,9 +86,9 @@ local labelPil = buat("TextLabel", {
 
 local labelPenuh = buat("TextLabel", {
 	Name = "MicdaPenuh",
-	AnchorPoint = Vector2.new(0.5, 0),
-	Position = UDim2.new(0.5, 0, 1, 6),
-	Size = UDim2.new(1.4, 0, 0, 24),
+	AnchorPoint = Vector2.new(0, 0),
+	Position = UDim2.new(0, 0, 1, 6),
+	Size = UDim2.new(0, 260, 0, 24),
 	BackgroundColor3 = Color3.fromRGB(18, 20, 16),
 	BackgroundTransparency = 0.1,
 	TextColor3 = Color3.fromRGB(255, 222, 130),
@@ -102,7 +102,7 @@ buat("UIStroke", {Color = Color3.fromRGB(212, 175, 55), Thickness = 1}, labelPen
 
 local function aturPosisiHud()
 	local inset = GuiService:GetTopbarInsets()
-	pil.Position = UDim2.new(0.5, 0, 0, inset.Top + 8)
+	pil.Position = UDim2.new(0, 12, 0, inset.Top + 8)
 end
 aturPosisiHud()
 GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(aturPosisiHud)
