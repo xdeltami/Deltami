@@ -1,7 +1,6 @@
 # DUNIA AKIOMIDA (Roblox)
 
-Status: LIVE di Roblox (**versionNumber 69**, 8 Nov 2026) — **DATARAN SESUAI GDD PLACE 01: TOKO BENIH 30 BENIH (1 KOIN, TUMBUH 1 DETIK) + ALUN-ALUN + PERMUKIMAN + KEBUN DEMO + PERBUKITAN + 4 GERBANG KAWASAN**
-BUILD v70 SIAP (8 Nov 2026): rojo build sukses, semua tes hijau — publish menunggu API key baru dari pemilik (key sebelumnya kedaluwarsa).
+Status: LIVE di Roblox (**versionNumber 70**, 8 Nov 2026) — **DATARAN V2: PERBAIKAN TENGGELAM TUNTAS + JALAN MASTERPLAN (ASPAL + JALUR SEPEDA + TROTOAR + MARKA + ZEBRA CROSS) + PAPAN NAMA JALAN + TAMAN TERTATA + JEMBATAN RATA JALAN**
 
 BARU v70 — PERBAIKAN TENGGELAM + JALAN MASTERPLAN RAPI (verifikasi laporan pemilik: "Ini bagus hanya saja kenapa bangunan masyarakat itu tenggelam dan ada beberapa NPC yang tenggelam... lebih diperkaya lagi... ada jalan aspal jalan pesepeda dan semuanya tertata seperti sudah ada masterplan nya"):
 

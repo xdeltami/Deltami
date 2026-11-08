@@ -42,7 +42,7 @@ fokus sesi ini pembangunan Dataran sesuai mandat pemilik.
 Rencana berikutnya (urut): gerbang kembali di 4 place kawasan; NPC
 berjalan + animasi lingkungan; pencahayaan malam; ikon benih di katalog.
 
-## Skor v70 (build siap, 8 Nov 2026) - PERBAIKAN TENGGELAM + JALAN MASTERPLAN RAPI
+## Skor v70 (LIVE #70, 8 Nov 2026) - PERBAIKAN TENGGELAM + JALAN MASTERPLAN RAPI
 
 Laporan pemilik: "Ini bagus hanya saja kenapa bangunan masyarakat itu
 tenggelam dan ada beberapa NPC yang tenggelam... lebih diperkaya lagi...
@@ -64,7 +64,7 @@ masterplan nya". Yang dikerjakan di v70:
    kosong koridor jalan; gang permukiman menyambung jalan aspal.
 4. **Mutu** — offline 421 PASS / 0 FAIL; playtest 206 PASS / 0 FAIL;
    massa 129 PASS / 0 FAIL (7 cek regresi geometri baru); luau-lsp 0
-   temuan; rojo build sukses. Publish #70 menunggu key baru pemilik.
+   temuan; rojo build sukses. Publish LIVE #70.
 
 | # | Kriteria | Skor | Alasan |
 |---|----------|------|--------|
